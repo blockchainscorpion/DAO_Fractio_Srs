@@ -1,0 +1,165 @@
+/* viewMore.css */
+
+/* Global styles */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+/* Navbar styles */
+.navbar {
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.logo span {
+  font-weight: bold;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+
+.user-menu img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+/* Main content styles */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Property header styles */
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#propertyTitle {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+#propertyPrice {
+  font-size: 24px;
+  color: #3366ff;
+}
+
+/* Property image styles */
+#propertyImage {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* Property details layout */
+.property-details {
+  display: flex;
+  gap: 20px;
+}
+
+/* Property info styles */
+.property-info {
+  flex: 2;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Property stats styles */
+.property-stats {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Invest section styles */
+.invest-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#investNow {
+  background-color: #3366ff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#investNow:hover {
+  background-color: #2855e0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .property-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #propertyTitle,
+  #propertyPrice {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  #propertyImage {
+    height: 250px;
+  }
+
+  .property-details {
+    flex-direction: column;
+  }
+
+  .property-info,
+  .property-stats {
+    flex: 1;
+  }
+
+  #investNow {
+    width: 100%;
+  }
+}

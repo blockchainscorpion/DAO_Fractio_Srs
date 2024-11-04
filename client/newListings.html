@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fractio - New Listings</title>
+    <link rel="stylesheet" href="./css/newListings.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="https://fractio.io/logo.svg" alt="Fractio logo" />
+        <span>Fractio</span>
+      </div>
+      <div class="user-menu">
+        <span>Edward Cooper</span>
+        <img src="https://fractio.io/user-avatar.jpg" alt="User avatar" />
+      </div>
+    </nav>
+    <div class="layout">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-item">
+            <a href="./index.html">Marketplace</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./yourEstate.html">Your Estate</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./DAO.html">DAO</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./settings.html">Settings</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./wallet.html">Wallet</a>
+          </div>
+          <div class="sidebar-item active">
+            <a href="./newListings.html">New listings</a>
+          </div>
+        </aside>
+        <!-- Rest of your layout content -->
+      </div>
+      <main class="main-content">
+        <div class="new-listings-header">
+          <h1>New Listings</h1>
+          <p>Discover the latest unique real estate opportunities on Fractio</p>
+        </div>
+        <div class="listings-grid" id="listingsGrid">
+          <!-- Listing cards will be dynamically inserted here -->
+        </div>
+      </main>
+    </div>
+    <script src="js/newListings.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/dao-integration.js"></script>
+    <script src="./js/contract-integration.js"></script>
+  </body>
+</html>

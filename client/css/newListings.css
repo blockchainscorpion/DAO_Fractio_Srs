@@ -1,0 +1,129 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+.navbar {
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logo img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+.logo span {
+  font-weight: bold;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+.user-menu img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+.layout {
+  display: flex;
+}
+.sidebar {
+  width: 200px;
+  background-color: white;
+  height: calc(100vh - 60px);
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.sidebar-item {
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.sidebar-item.active {
+  background-color: #e6e9ff;
+  color: #3366ff;
+  font-weight: bold;
+}
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+.new-listings-header {
+  margin-bottom: 20px;
+}
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.listing-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+.listing-card:hover {
+  transform: translateY(-5px);
+}
+.listing-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+.listing-details {
+  padding: 15px;
+}
+.listing-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.listing-price {
+  font-size: 16px;
+  color: #3366ff;
+  margin-bottom: 10px;
+}
+.listing-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+}
+.listing-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.action-button {
+  background-color: #3366ff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.action-button:hover {
+  background-color: #2855e0;
+}
+.action-button.secondary {
+  background-color: #f0f2f5;
+  color: #3366ff;
+}
+.action-button.secondary:hover {
+  background-color: #e6e9ff;
+}

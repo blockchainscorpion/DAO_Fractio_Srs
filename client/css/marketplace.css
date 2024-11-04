@@ -1,0 +1,162 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+.navbar {
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logo img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+.logo span {
+  font-weight: bold;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+.user-menu img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+.layout {
+  display: flex;
+}
+.sidebar {
+  width: 200px;
+  background-color: white;
+  height: calc(100vh - 60px);
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.sidebar-item {
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.sidebar-item.active {
+  background-color: #e6e9ff;
+  color: #3366ff;
+  font-weight: bold;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+.marketplace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 20px;
+  padding: 5px 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.search-bar input {
+  border: none;
+  outline: none;
+  padding: 5px;
+  width: 300px;
+}
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+.property-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.property-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+.property-info {
+  padding: 15px;
+}
+.property-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.property-price {
+  color: #4a4a4a;
+  font-size: 14px;
+}
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.button-group button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button-group button:first-child {
+  background-color: #3366ff;
+  color: white;
+}
+
+.button-group button:first-child:hover {
+  background-color: #2855e0;
+}
+
+.button-group button:last-child {
+  background-color: white;
+  color: #3366ff;
+  border: 1px solid #3366ff;
+}
+
+.button-group button:last-child:hover {
+  background-color: #e6e9ff;
+}
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #3366ff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2855e0;
+}

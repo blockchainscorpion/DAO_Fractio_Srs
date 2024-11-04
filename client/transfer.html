@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fractio - Transfer Tokens</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo">
+          <img src="https://fractio.io/logo.svg" alt="Fractio logo" />
+          <span>Fractio</span>
+        </div>
+        <div class="user-menu">
+          Edward Cooper
+          <img src="https://fractio.io/user-avatar.jpg" alt="User avatar" />
+        </div>
+      </nav>
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-item">
+            <a href="./index.html">Marketplace</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./yourEstate.html">Your Estate</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./DAO.html">DAO</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./settings.html">Settings</a>
+          </div>
+          <div class="sidebar-item active">
+            <a href="./wallet.html">Wallet</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./newListings.html">New listings</a>
+          </div>
+        </aside>
+
+        <main class="main-content">
+          <div class="transfer-container">
+            <h1>Transfer Tokens</h1>
+            <form id="transferForm">
+              <div class="form-group">
+                <label for="tokenType">Select Token</label>
+                <select id="tokenType" name="tokenType" required>
+                  <option value="">Choose a token</option>
+                  <option value="ESBT">
+                    Empire State Building Tokens (ESBT)
+                  </option>
+                  <option value="BKT">Burj Khalifa Tokens (BKT)</option>
+                  <option value="SCT">Shopping Center Tokens (SCT)</option>
+                </select>
+              </div>
+              <div id="tokenBalance" class="balance-display"></div>
+              <div class="form-group">
+                <label for="recipientAddress">Recipient Address</label>
+                <input
+                  type="text"
+                  id="recipientAddress"
+                  name="recipientAddress"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="transferAmount">Amount to Transfer</label>
+                <input
+                  type="number"
+                  id="transferAmount"
+                  name="transferAmount"
+                  required
+                  min="0.000001"
+                  step="0.000001"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Transfer Tokens
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="js/wallet.js"></script>
+    <script type="module" src="js/utility.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/dao-integration.js"></script>
+    <script src="./js/contract-integration.js"></script>
+  </body>
+</html>

@@ -1,0 +1,153 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.navbar {
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.logo span {
+  font-weight: bold;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+
+.user-menu img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.investment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#investmentTitle {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+#investmentStatus {
+  font-size: 18px;
+  color: #3366ff;
+}
+
+.investment-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.investment-details {
+  display: flex;
+  gap: 20px;
+}
+
+.investment-info {
+  flex: 2;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.investment-stats {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.action-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn {
+  background-color: #3366ff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #2855e0;
+}
+
+@media (max-width: 768px) {
+  .investment-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #investmentTitle,
+  #investmentStatus {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .investment-image {
+    height: 250px;
+  }
+
+  .investment-details {
+    flex-direction: column;
+  }
+
+  .investment-info,
+  .investment-stats {
+    flex: 1;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

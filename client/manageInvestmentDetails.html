@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Investment - Fractio</title>
+    <link rel="stylesheet" href="./css/manageInvestmentDetails.css" />
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar">
+        <div class="logo">
+          <img src="/" alt="Fractio logo" />
+          <span>Fractio</span>
+        </div>
+        <div class="user-menu">
+          <span>Edward Cooper</span>
+          <img src="https://fractio.io/user-avatar.jpg" alt="User avatar" />
+        </div>
+      </nav>
+    </header>
+
+    <div class="layout">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-item">
+            <a href="./index.html">Marketplace</a>
+          </div>
+          <div class="sidebar-item active">
+            <a href="./yourEstate.html">Your Estate</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./DAO.html">DAO</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./settings.html">Settings</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./wallet.html">Wallet</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./newListings.html">New listings</a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="main-content">
+        <div class="property-header">
+          <div class="property-title" id="propertyTitle">
+            HMO Property in Manchester
+          </div>
+          <div class="property-status" id="propertyStatus">Active</div>
+        </div>
+
+        <div class="property-details">
+          <div class="detail-card">
+            <div class="detail-title">Your Investment</div>
+            <div class="detail-value" id="yourInvestment">$5,000</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-title">Total Property Value</div>
+            <div class="detail-value" id="totalPropertyValue">$500,000</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-title">Annual Yield</div>
+            <div class="detail-value" id="annualYield">7.5%</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-title">Occupancy Rate</div>
+            <div class="detail-value" id="occupancyRate">95%</div>
+          </div>
+        </div>
+
+        <div class="management-actions">
+          <button id="viewFinancials">View Financials</button>
+          <button id="manageOccupancy">Manage Occupancy</button>
+          <button id="scheduleMaintenance">Schedule Maintenance</button>
+          <button id="adjustInvestment">Adjust Investment</button>
+        </div>
+
+        <div class="performance-chart">
+          <h2>Performance Over Time</h2>
+          <div id="chart">
+            <!-- Chart will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/manageInvestmentDetails.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/dao-integration.js"></script>
+    <script src="./js/contract-integration.js"></script>
+  </body>
+</html>
