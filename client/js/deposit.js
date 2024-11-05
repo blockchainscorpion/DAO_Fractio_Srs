@@ -1,5 +1,3 @@
-// src/js/deposit.js
-
 function handleDeposit(event) {
   event.preventDefault();
 

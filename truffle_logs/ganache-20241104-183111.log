@@ -517,3 +517,5 @@
 [2024/11/04 18:32:38.296] - eth_getTransactionCount
 [2024/11/04 18:32:38.321] - eth_getBalance
 [2024/11/04 18:32:38.345] - eth_getTransactionCount
+[2024/11/04 19:22:19.107] - eth_unsubscribe
+[2024/11/04 19:22:19.214] - eth_unsubscribe
