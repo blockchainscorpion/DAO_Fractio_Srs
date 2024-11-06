@@ -1,5 +1,3 @@
-// contract-integration.js
-
 // Global state object to store contract instances and web3 connection
 const ContractState = {
   web3: null,

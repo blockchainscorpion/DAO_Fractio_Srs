@@ -2,202 +2,107 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DAO Integration Tests</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/daoTesting.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Load this first -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:* http://127.0.0.1:*;"
+    />
+
+    <!-- Contract dependencies -->
+    <script src="../node_modules/web3/dist/web3.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/contract-integration.js"></script>
+
+    <!-- Test framework -->
+    <script src="./js/tests/TestRunner.js"></script>
+    <script src="./js/tests/daoTesting.js"></script>
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      .test-container {
         max-width: 800px;
-        margin: 0 auto;
+        margin: 20px auto;
         padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .test-status {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
       }
       .test-results {
         margin-top: 20px;
       }
-      .test-item {
+      .test-result {
         padding: 10px;
         margin: 5px 0;
-        border-radius: 4px;
+        border-left: 4px solid #ccc;
       }
-      .test-pass {
-        background-color: #e6ffe6;
-        border: 1px solid #99ff99;
+      .test-result.pass {
+        border-left-color: #28a745;
       }
-      .test-fail {
-        background-color: #ffe6e6;
-        border: 1px solid #ff9999;
-      }
-      .test-pending {
-        background-color: #fff3e6;
-        border: 1px solid #ffd699;
-      }
-      .summary {
-        margin: 20px 0;
-        padding: 10px;
-        background-color: #f0f0f0;
-        border-radius: 4px;
+      .test-result.fail {
+        border-left-color: #dc3545;
       }
       button {
         padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        background-color: #4caf50;
+        background-color: #007bff;
         color: white;
         border: none;
         border-radius: 4px;
+        cursor: pointer;
       }
       button:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
+        background-color: #ccc;
       }
-      .current-test {
-        margin: 20px 0;
+      #currentTest {
+        margin: 10px 0;
         padding: 10px;
-        background-color: #e6f3ff;
+        background-color: #e9ecef;
         border-radius: 4px;
-        border: 1px solid #99ccff;
-      }
-      #testProgress {
-        margin: 20px 0;
       }
     </style>
   </head>
   <body>
-    <h1>DAO Integration Tests</h1>
-    <div id="testProgress"></div>
-    <button id="runTests" onclick="runTests()">Run Tests</button>
-    <div id="currentTest" class="current-test" style="display: none"></div>
-    <div class="summary" id="summary"></div>
-    <div class="test-results" id="testResults"></div>
+    <div class="test-container">
+      <h1>DAO Integration Tests</h1>
+      <div id="testProgress"></div>
+      <button id="runTests">Run Tests</button>
+      <div id="currentTest" class="current-test" style="display: none"></div>
+      <div id="summary" class="summary"></div>
+      <div id="testResults" class="test-results"></div>
+    </div>
 
     <script>
-      let tester;
+      document.addEventListener('DOMContentLoaded', function () {
+        const runner = new TestRunner();
 
-      async function updateTestProgress(message, status = 'pending') {
-        const currentTest = document.getElementById('currentTest');
-        currentTest.style.display = 'block';
-        currentTest.innerHTML = `
-                <h3>Current Test: ${message}</h3>
-                <p>Status: ${status}</p>
-                <p>Waiting for MetaMask confirmation...</p>
-            `;
-      }
+        // Add all test cases
+        runner.addTest('Member Status', (tester) => tester.testMemberStatus());
+        runner.addTest('Token Balance', (tester) => tester.testTokenBalance());
+        runner.addTest('Voting Power', (tester) => tester.testVotingPower());
+        runner.addTest('Proposal Creation', (tester) =>
+          tester.testProposalCreation()
+        );
+        runner.addTest('Event Listeners', (tester) =>
+          tester.testEventListeners()
+        );
+        runner.addTest('UI Updates', (tester) => tester.testUIUpdates());
 
-      async function runTests() {
-        const button = document.getElementById('runTests');
-        const resultsDiv = document.getElementById('testResults');
-        const summaryDiv = document.getElementById('summary');
-        const progressDiv = document.getElementById('testProgress');
-
-        button.disabled = true;
-        resultsDiv.innerHTML = '';
-        summaryDiv.innerHTML = '';
-        progressDiv.innerHTML = '<h2>Test Progress</h2>';
-
-        try {
-          tester = new DAOTester();
-
-          // Initialize
-          updateTestProgress('Initializing Web3 and Contracts');
-          if (!(await tester.initialize())) {
-            throw new Error('Initialization failed');
-          }
-          addTestResult(
-            'Initialization',
-            true,
-            'Web3 and Contracts initialized'
-          );
-
-          // Member Status
-          updateTestProgress('Checking Member Status');
-          const memberStatus = await tester.testMemberStatus();
-          addTestResult(
-            'Member Status',
-            true,
-            `Member status checked: ${JSON.stringify(memberStatus)}`
-          );
-
-          // Create Proposal
-          updateTestProgress('Creating Test Proposal');
-          const proposalId = await tester.testProposalCreation();
-          addTestResult(
-            'Proposal Creation',
-            true,
-            `Created proposal ID: ${proposalId}`
-          );
-
-          if (proposalId !== undefined) {
-            // Vote on Proposal
-            updateTestProgress('Voting on Proposal');
-            await tester.testVoting(proposalId);
-            addTestResult('Voting', true, `Voted on proposal ${proposalId}`);
-          }
-
-          // Check Voting Power
-          updateTestProgress('Checking Voting Power');
-          const votingPower = await tester.testVotingPower();
-          addTestResult(
-            'Voting Power',
-            true,
-            `Current voting power: ${votingPower}`
-          );
-
-          // Check Token Balance
-          updateTestProgress('Checking Token Balance');
-          const balance = await tester.testTokenBalance();
-          addTestResult('Token Balance', true, `Current balance: ${balance}`);
-
-          // Test Event Listeners
-          updateTestProgress('Setting up Event Listeners');
-          await tester.testEventListeners();
-          addTestResult('Event Listeners', true, 'Event listeners configured');
-
-          // Update UI
-          updateTestProgress('Testing UI Updates');
-          await tester.testUIUpdates();
-          addTestResult('UI Updates', true, 'UI elements verified');
-
-          document.getElementById('currentTest').style.display = 'none';
-          updateSummary();
-        } catch (error) {
-          console.error('Test error:', error);
-          addTestResult('Test Suite', false, error.message);
-          document.getElementById('currentTest').innerHTML = `
-                    <h3>Testing Failed</h3>
-                    <p>Error: ${error.message}</p>
-                `;
-        }
-
-        button.disabled = false;
-      }
-
-      function addTestResult(testName, passed, message) {
-        const resultsDiv = document.getElementById('testResults');
-        const testDiv = document.createElement('div');
-        testDiv.className = `test-item ${passed ? 'test-pass' : 'test-fail'}`;
-        testDiv.innerHTML = `
-                <h3>${testName}</h3>
-                <p>${message}</p>
-                <small>${new Date().toISOString()}</small>
-            `;
-        resultsDiv.appendChild(testDiv);
-      }
-
-      function updateSummary() {
-        const summaryDiv = document.getElementById('summary');
-        const passedTests = document.querySelectorAll('.test-pass').length;
-        const failedTests = document.querySelectorAll('.test-fail').length;
-
-        summaryDiv.innerHTML = `
-                <h2>Test Summary</h2>
-                <p>Total Tests: ${passedTests + failedTests}</p>
-                <p>Passed: ${passedTests}</p>
-                <p>Failed: ${failedTests}</p>
-            `;
-      }
+        // Attach runner to run button
+        document
+          .getElementById('runTests')
+          .addEventListener('click', () => runner.runTests());
+      });
     </script>
   </body>
 </html>
