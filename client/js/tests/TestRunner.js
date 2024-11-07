@@ -1,6 +1,3 @@
-/**
- * TestRunner class handles test execution and reporting
- */
 class TestRunner {
   constructor() {
     this.tests = [];
@@ -8,93 +5,95 @@ class TestRunner {
     this.results = [];
   }
 
-  /**
-   * Add a test to the queue
-   * @param {string} name Test name
-   * @param {Function} testFn Test function
-   */
   addTest(name, testFn) {
+    console.log(`Adding test: ${name}`);
     this.tests.push({ name, testFn });
   }
 
-  /**
-   * Update UI with current test status
-   * @param {string} testName Name of current test
-   * @param {string} status Test status
-   */
-  updateTestStatus(testName, status) {
-    const currentTest = document.getElementById('currentTest');
-    if (currentTest) {
-      currentTest.textContent = `${testName}: ${status}`;
-      currentTest.style.display = 'block';
-    }
-  }
-
-  /**
-   * Add test result to UI
-   * @param {string} name Test name
-   * @param {boolean} passed Test result
-   * @param {string} error Error message if any
-   */
   addTestResult(name, passed, error = '') {
+    console.log(`Test Result - ${name}: ${passed ? 'PASSED' : 'FAILED'}`);
+    if (error) console.log(`Error: ${error}`);
+
     const resultDiv = document.createElement('div');
     resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
     resultDiv.innerHTML = `
             <strong>${name}:</strong> ${passed ? 'Passed' : 'Failed'}
             ${error ? `<br><small>Error: ${error}</small>` : ''}
         `;
-    document.getElementById('testResults').appendChild(resultDiv);
-  }
 
-  /**
-   * Display test summary in UI
-   * @param {Object} report Test report object
-   */
-  displaySummary(report) {
-    const summaryDiv = document.getElementById('summary');
-    if (summaryDiv) {
-      summaryDiv.innerHTML = `
-                <div class="test-status ${
-                  report.failedTests === 0 ? 'success' : 'error'
-                }">
-                    Total Tests: ${report.totalTests}<br>
-                    Passed: ${report.passedTests}<br>
-                    Failed: ${report.failedTests}
-                </div>
-            `;
+    const resultsContainer = document.getElementById('testResults');
+    if (resultsContainer) {
+      console.log(`Appending result to container for: ${name}`);
+      resultsContainer.appendChild(resultDiv);
+    } else {
+      console.error('Results container not found!');
     }
   }
 
-  /**
-   * Run all queued tests
-   * @returns {Promise<Object>} Test results
-   */
-  async runTests() {
+  displaySummary(report) {
+    console.log('Displaying summary:', report);
+    const summaryDiv = document.getElementById('summary');
+    if (summaryDiv) {
+      const summaryHtml = `
+                <div class="test-status ${
+                  report.failedTests === 0 ? 'success' : 'error'
+                }">
+                    <h3>Test Summary:</h3>
+                    <p>Total Tests: ${report.totalTests}</p>
+                    <p>Passed: ${report.passedTests}</p>
+                    <p>Failed: ${report.failedTests}</p>
+                </div>
+            `;
+      console.log('Setting summary HTML');
+      summaryDiv.innerHTML = summaryHtml;
+    } else {
+      console.error('Summary container not found!');
+    }
+  }
+
+  async runTests(event) {
+    console.log('runTests called');
+    if (event) {
+      event.preventDefault();
+    }
+
+    // Immediately show that tests are starting
+    const summaryDiv = document.getElementById('summary');
+    if (summaryDiv) {
+      summaryDiv.innerHTML = '<div class="test-status">Running tests...</div>';
+    }
+
+    console.log('Starting test run...');
     const button = document.getElementById('runTests');
     if (button) button.disabled = true;
 
     try {
       // Clear previous results
       const resultsDiv = document.getElementById('testResults');
-      if (resultsDiv) resultsDiv.innerHTML = '';
-
       const summaryDiv = document.getElementById('summary');
-      if (summaryDiv) summaryDiv.innerHTML = '';
 
-      // Initialize DAO tester
+      if (resultsDiv) {
+        console.log('Clearing previous results');
+        resultsDiv.innerHTML = '';
+      }
+      if (summaryDiv) {
+        summaryDiv.innerHTML = '';
+      }
+
+      // Initialize and run tests
+      console.log('Initializing DAO tester...');
       const tester = new DAOTester();
 
-      // Run initialization test first
-      this.updateTestStatus('Initialization', 'Running');
+      console.log('Running initialization test...');
       await this.runTest('Initialization', () => tester.initialize());
 
       // Run remaining tests
       for (const test of this.tests) {
-        this.updateTestStatus(test.name, 'Running');
+        console.log(`Running test: ${test.name}`);
         await this.runTest(test.name, test.testFn.bind(null, tester));
       }
 
-      // Display final results
+      // Compile and display results
       const report = {
         totalTests: this.results.length,
         passedTests: this.results.filter((r) => r.passed).length,
@@ -102,8 +101,8 @@ class TestRunner {
         results: this.results,
       };
 
+      console.log('Final test report:', report);
       this.displaySummary(report);
-      return report;
     } catch (error) {
       console.error('Test suite failed:', error);
       this.displaySummary({
@@ -112,26 +111,29 @@ class TestRunner {
         failedTests: this.results.filter((r) => !r.passed).length + 1,
         results: [
           ...this.results,
-          { name: 'Test Suite', passed: false, error: error.message },
+          {
+            name: 'Test Suite',
+            passed: false,
+            error: error.message,
+          },
         ],
       });
     } finally {
-      if (button) button.disabled = false;
+      if (button) {
+        button.disabled = false;
+      }
     }
   }
 
-  /**
-   * Run a single test
-   * @param {string} name Test name
-   * @param {Function} testFn Test function
-   */
   async runTest(name, testFn) {
+    console.log(`Executing test: ${name}`);
     try {
       await testFn();
+      console.log(`Test passed: ${name}`);
       this.results.push({ name, passed: true });
       this.addTestResult(name, true);
     } catch (error) {
-      console.error(`Test '${name}' failed:`, error);
+      console.error(`Test failed: ${name}`, error);
       this.results.push({ name, passed: false, error: error.message });
       this.addTestResult(name, false, error.message);
       throw error;

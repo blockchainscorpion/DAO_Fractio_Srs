@@ -1,10 +1,3 @@
-import { fetchProperties, createPropertyCard } from '../modules/propertyUtils.js';
-import { setupSearchListener, performSearch } from '../modules/searchUtils.js';
-import { initializeWallet, getWalletBalance } from '../modules/walletUtils.js';
-import { renderPropertyCard, handleCardInteractions } from '../modules/propertyCard.js';
-import { renderSearchBar, handleSearchInput } from '../modules/searchBar.js';
-
-
 // Function to create a property card
 function createPropertyCard(property) {
   const card = document.createElement('div');

@@ -2,22 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>DAO Integration Tests</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Load this first -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:* http://127.0.0.1:*;"
-    />
+
+    <title>DAO Integration Tests</title>
 
     <!-- Contract dependencies -->
     <script src="../node_modules/web3/dist/web3.min.js"></script>
-    <script src="./js/config.js"></script>
-    <script src="./js/contract-integration.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/contract-integration.js"></script>
 
     <!-- Test framework -->
-    <script src="./js/tests/TestRunner.js"></script>
-    <script src="./js/tests/daoTesting.js"></script>
+    <script src="js/tests/TestRunner.js"></script>
+    <script src="js/tests/daoTesting.js"></script>
 
     <style>
       .test-container {
@@ -64,44 +60,54 @@
       button:disabled {
         background-color: #ccc;
       }
-      #currentTest {
-        margin: 10px 0;
-        padding: 10px;
-        background-color: #e9ecef;
-        border-radius: 4px;
-      }
     </style>
   </head>
   <body>
     <div class="test-container">
       <h1>DAO Integration Tests</h1>
       <div id="testProgress"></div>
-      <button id="runTests">Run Tests</button>
+      <button id="runTests" onclick="runTestSuite()">Run Tests</button>
       <div id="currentTest" class="current-test" style="display: none"></div>
       <div id="summary" class="summary"></div>
       <div id="testResults" class="test-results"></div>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const runner = new TestRunner();
+      let testRunner;
 
-        // Add all test cases
-        runner.addTest('Member Status', (tester) => tester.testMemberStatus());
-        runner.addTest('Token Balance', (tester) => tester.testTokenBalance());
-        runner.addTest('Voting Power', (tester) => tester.testVotingPower());
-        runner.addTest('Proposal Creation', (tester) =>
+      function runTestSuite() {
+        console.log('Running test suite...');
+        if (testRunner) {
+          testRunner.runTests();
+        } else {
+          console.error('Test runner not initialized!');
+        }
+      }
+
+      // Initialize when everything is loaded
+      window.addEventListener('load', function () {
+        console.log('Page loaded, initializing test runner...');
+        testRunner = new TestRunner();
+
+        // Add test cases
+        testRunner.addTest('Member Status', (tester) =>
+          tester.testMemberStatus()
+        );
+        testRunner.addTest('Token Balance', (tester) =>
+          tester.testTokenBalance()
+        );
+        testRunner.addTest('Voting Power', (tester) =>
+          tester.testVotingPower()
+        );
+        testRunner.addTest('Proposal Creation', (tester) =>
           tester.testProposalCreation()
         );
-        runner.addTest('Event Listeners', (tester) =>
+        testRunner.addTest('Event Listeners', (tester) =>
           tester.testEventListeners()
         );
-        runner.addTest('UI Updates', (tester) => tester.testUIUpdates());
+        testRunner.addTest('UI Updates', (tester) => tester.testUIUpdates());
 
-        // Attach runner to run button
-        document
-          .getElementById('runTests')
-          .addEventListener('click', () => runner.runTests());
+        console.log('Test runner initialized with all tests added');
       });
     </script>
   </body>
