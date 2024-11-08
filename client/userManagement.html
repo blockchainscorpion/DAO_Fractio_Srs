@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="./userManagement.html" />
+    <title>Fractio CRM - User Management</title>
+    <link rel="stylesheet" href="./css/userManagement.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/datatables.net-bs5/css/dataTables.bootstrap5.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Required scripts for Web3 integration -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.11.3/js/dataTables.bootstrap5.min.js"></script>
+  </head>
+  <body>
+    <!-- head & Navbar info -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">Fractio CRM</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="./notifications.html">
+                <i class="fas fa-bell"></i>
+                <span class="badge bg-danger">3</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./messages.html">
+                <i class="fas fa-envelope"></i>
+                <span class="badge bg-primary">5</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  alt="Portrait of a smiling middle-aged man wearing a blue suit and white shirt, posing with arms crossed against a white background"
+                  src="./img/IMG_5974.png"
+                  width="40"
+                  height="40"
+                  class="rounded-circle me-2"
+                />
+                Soufiane Rochdi
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" href="./userProfile.html"
+                    >My Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./settings.html">Settings</a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#">Logout</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+          <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="./index.html">
+                  <i class="fas fa-tachometer-alt me-2"></i>
+                  Dashboard
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./listings.html">
+                  <i class="fas fa-home me-2"></i>
+                  Listings
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="./contacts.html">
+                  <i class="fas fa-address-book me-2"></i>
+                  Contacts
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./reminders.html">
+                  <i class="fas fa-bell me-2"></i>
+                  Reminders
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./tasks.html">
+                  <i class="fas fa-tasks me-2"></i>
+                  Tasks
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./reports.html">
+                  <i class="fas fa-chart-bar me-2"></i>
+                  Reports
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./tokenization.html">
+                  <i class="fas fa-link me-2"></i>
+                  Tokenization
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./userManagement.html">
+                  <i class="fa fa-users" aria-hidden="true"></i>
+                  User Management
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./tokenIssuance.html">
+                  <i class="fa fa-th-large" aria-hidden="true"></i>
+                  Token Issuance
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+          <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+          >
+            <h1 class="h2">User Management</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#addMemberModal"
+              >
+                Add New Member
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                id="refreshMembers"
+              >
+                Refresh List
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                id="exportUsers"
+              >
+                Export Users
+              </button>
+            </div>
+          </div>
+
+          <!-- Members List Card -->
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Member List</h5>
+              <table id="membersTable" class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Address</th>
+                    <th>Voting Power</th>
+                    <th>KYC Status</th>
+                    <th>Is Approved</th>
+                    <th>Delegated To</th>
+                    <th>Is Admin</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Admin Controls Card -->
+          <div class="card mt-4" id="adminControls" style="display: none">
+            <div class="card-header">
+              <h5 class="mb-0">Administrative Controls</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Role Management</h6>
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="roleAddress"
+                      placeholder="Member Address"
+                    />
+                    <button class="btn btn-outline-primary" id="grantAdminRole">
+                      Grant Admin Role
+                    </button>
+                    <button class="btn btn-outline-danger" id="revokeAdminRole">
+                      Revoke Admin Role
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Global Settings</h6>
+                  <div class="input-group mb-3">
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="quorumPercentage"
+                      placeholder="New Quorum %"
+                    />
+                    <button class="btn btn-outline-secondary" id="updateQuorum">
+                      Update Quorum
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Member</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal">
+              Add New Member
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addMemberForm">
+              <div class="mb-3">
+                <label class="form-label">Member Address</label>
+                <input
+                  title="Member Address"
+                  type="text"
+                  class="form-control"
+                  id="memberAddress"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Initial Voting Power (ETH)</label>
+                <input
+                  title="Initial Voting Power (ETH)"
+                  type="number"
+                  class="form-control"
+                  id="votingPower"
+                  required
+                  min="0"
+                  step="0.1"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" id="submitAddMember">
+              Add Member
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Member Modal -->
+    <div class="modal fade" id="manageMemberModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Manage Member</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal">
+              Manage Member
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Member Address</label>
+              <input
+                title="member-Address"
+                type="text"
+                class="form-control"
+                id="manageMemberAddress"
+                readonly
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Update Voting Power (ETH)</label>
+              <input
+                title="form-label-item"
+                type="number"
+                class="form-control"
+                id="updateVotingPower"
+                min="0"
+                step="0.1"
+              />
+            </div>
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                title="form-check-label"
+                type="checkbox"
+                id="kycStatus"
+              />
+              <label class="form-check-label">KYC Approved</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" id="removeMemberBtn">
+              Remove Member
+            </button>
+            <button type="button" class="btn btn-primary" id="updateMemberBtn">
+              Update Member
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Load contract config before userManagement.js -->
+    <script src="./js/config.js"></script>
+    <script src="./js/userManagement.js"></script>
+
+    <script>
+      // Initialize tooltips
+      var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      );
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    </script>
+  </body>
+</html>

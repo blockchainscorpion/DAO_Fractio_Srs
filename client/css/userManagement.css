@@ -1,0 +1,70 @@
+:root {
+  --primary-color: #1e3256;
+  --secondary-color: #ff6600;
+  --accent-color: #ffd700;
+  --light-gray: #f5f5f5;
+  --dark-gray: #333333;
+  --white: #ffffff;
+}
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--light-gray);
+}
+.navbar {
+  background-color: var(--primary-color);
+}
+.navbar-brand,
+.nav-link {
+  color: var(--white) !important;
+}
+.sidebar {
+  background-color: var(--primary-color);
+  color: var(--white);
+  min-height: calc(100vh - 56px);
+}
+.sidebar .nav-link {
+  color: var(--white);
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.content {
+  padding: 20px;
+}
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+.card-header {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+.btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+.btn-primary:hover {
+  background-color: #e65c00;
+  border-color: #e65c00;
+}
+.tokenization-stage {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+.tokenization-stage.active {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+.tokenization-stage i {
+  margin-right: 10px;
+}
+.property-card {
+  transition: transform 0.3s ease;
+}
+.property-card:hover {
+  transform: translateY(-5px);
+}
