@@ -103,6 +103,35 @@ class DAOMemberManager {
         );
       }
 
+      try {
+        await this.governanceContract.methods.votingPeriod().call();
+        await this.tokenContract.methods.name().call();
+        console.log('✅ Contract connections verified');
+
+        // Add KYC role verification here
+        const kycRole = await this.tokenContract.methods.KYC_ROLE().call();
+        console.log('KYC Role:', kycRole);
+
+        // Check if Governance contract has KYC role
+        const govHasKycRole = await this.tokenContract.methods
+          .hasRole(kycRole, this.governanceContract._address)
+          .call();
+
+        if (!govHasKycRole) {
+          console.log('Granting KYC role to Governance contract...');
+          await this.tokenContract.methods
+            .grantRole(kycRole, this.governanceContract._address)
+            .send({ from: this.currentAccount });
+          console.log('✅ KYC role granted to Governance contract');
+        } else {
+          console.log('✅ Governance contract already has KYC role');
+        }
+      } catch (error) {
+        throw new Error(
+          'Failed to verify contract connections: ' + error.message
+        );
+      }
+
       // Check if current user is admin
       const adminRole = await this.governanceContract.methods
         .ADMIN_ROLE()
@@ -362,125 +391,86 @@ class DAOMemberManager {
         newKYCStatus,
       });
 
-      // Verify admin status first
+      // 1. Check permissions
       const adminRole = await this.governanceContract.methods
         .ADMIN_ROLE()
         .call();
-      const isAdmin = await this.governanceContract.methods
-        .hasRole(adminRole, this.currentAccount)
-        .call();
+      const kycRole = await this.tokenContract.methods.KYC_ROLE().call(); // Changed to tokenContract
+
+      console.log('Roles:', { adminRole, kycRole });
+
+      const [isAdmin, hasKycRole] = await Promise.all([
+        this.governanceContract.methods
+          .hasRole(adminRole, this.currentAccount)
+          .call(),
+        this.tokenContract.methods.hasRole(kycRole, this.currentAccount).call(), // Changed to tokenContract
+      ]);
+
+      console.log('Permission check:', {
+        isAdmin,
+        hasKycRole,
+      });
 
       if (!isAdmin) {
-        throw new Error(
-          'Current user does not have admin rights to update members'
-        );
+        throw new Error('Current user does not have admin rights');
       }
 
-      // Get current member info
+      if (!hasKycRole && newKYCStatus !== undefined) {
+        throw new Error('Current user does not have KYC management rights');
+      }
+
+      // 2. Get current member info
       const currentMemberInfo = await this.governanceContract.methods
         .members(address)
         .call();
       console.log('Current member info:', currentMemberInfo);
 
-      // Prepare transaction parameters
-      const txParams = {
-        from: this.currentAccount,
-        gas: (await this.web3.eth.getGasPrice()) * 2, // Higher gas price multiplier
-        gasLimit: 300000, // Higher gas limit
-      };
+      // 3. Update KYC status if changed and have permission
+      if (currentMemberInfo.hasPassedKYC !== newKYCStatus && hasKycRole) {
+        console.log('Attempting KYC status update...');
 
-      console.log('Transaction parameters:', txParams);
+        try {
+          // Check if Governance contract has KYC role
+          const govHasKycRole = await this.tokenContract.methods
+            .hasRole(kycRole, this.governanceContract._address)
+            .call();
 
-      // Update KYC status if changed
-      if (currentMemberInfo.hasPassedKYC !== newKYCStatus) {
-        console.log('Updating KYC status...');
+          if (!govHasKycRole) {
+            console.log('Granting KYC role to Governance contract...');
+            await this.tokenContract.methods
+              .grantRole(kycRole, this.governanceContract._address)
+              .send({ from: this.currentAccount });
+          }
 
-        const updateKYCTx = this.governanceContract.methods.updateKYCStatus(
-          address,
-          newKYCStatus
-        );
+          // Update KYC status
+          console.log('Sending KYC update transaction...');
+          const receipt = await this.governanceContract.methods
+            .updateKYCStatus(address, newKYCStatus)
+            .send({ from: this.currentAccount });
 
-        // Estimate gas specifically for KYC update
-        const gasEstimate = await updateKYCTx
-          .estimateGas({
-            from: this.currentAccount,
-          })
-          .catch((err) => {
-            console.error('Gas estimation failed for KYC update:', err);
-            return 300000; // fallback gas limit
-          });
-
-        console.log('Gas estimate for KYC update:', gasEstimate);
-
-        // Send the transaction with specific parameters
-        await updateKYCTx
-          .send({
-            from: this.currentAccount,
-            gas: Math.ceil(gasEstimate * 1.5), // Add 50% buffer
-            maxFeePerGas: null, // Let MetaMask handle the gas fee
-            maxPriorityFeePerGas: null, // Let MetaMask handle the priority fee
-          })
-          .on('transactionHash', (hash) => {
-            console.log('KYC update transaction hash:', hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log('KYC update receipt:', receipt);
-          })
-          .on('error', (err) => {
-            console.error('KYC update error:', err);
-            throw err;
-          });
+          console.log('KYC update successful, receipt:', receipt);
+        } catch (txError) {
+          console.error('Detailed transaction error:', txError);
+          throw new Error(`KYC update failed: ${txError.message}`);
+        }
       }
 
-      // Update voting power if changed
-      if (
-        this.web3.utils.fromWei(currentMemberInfo.votingPower, 'ether') !==
-        newVotingPower
-      ) {
+      // 4. Update voting power if changed
+      const currentVotingPower = this.web3.utils.fromWei(
+        currentMemberInfo.votingPower,
+        'ether'
+      );
+      if (currentVotingPower !== newVotingPower) {
         console.log('Updating voting power...');
-
-        const votingPowerWei = this.web3.utils.toWei(newVotingPower, 'ether');
-        const updateVotingTx =
-          this.governanceContract.methods.setMemberVotingPower(
+        await this.governanceContract.methods
+          .setMemberVotingPower(
             address,
-            votingPowerWei
-          );
-
-        // Estimate gas for voting power update
-        const gasEstimate = await updateVotingTx
-          .estimateGas({
-            from: this.currentAccount,
-          })
-          .catch((err) => {
-            console.error(
-              'Gas estimation failed for voting power update:',
-              err
-            );
-            return 300000; // fallback gas limit
-          });
-
-        console.log('Gas estimate for voting power update:', gasEstimate);
-
-        await updateVotingTx
-          .send({
-            from: this.currentAccount,
-            gas: Math.ceil(gasEstimate * 1.5),
-            maxFeePerGas: null,
-            maxPriorityFeePerGas: null,
-          })
-          .on('transactionHash', (hash) => {
-            console.log('Voting power update transaction hash:', hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log('Voting power update receipt:', receipt);
-          })
-          .on('error', (err) => {
-            console.error('Voting power update error:', err);
-            throw err;
-          });
+            this.web3.utils.toWei(newVotingPower, 'ether')
+          )
+          .send({ from: this.currentAccount });
       }
 
-      // Hide modal and refresh list
+      // 5. Close modal and refresh
       const modal = bootstrap.Modal.getInstance(
         document.getElementById('manageMemberModal')
       );
@@ -492,26 +482,19 @@ class DAOMemberManager {
     } catch (error) {
       console.error('Error updating member:', error);
 
-      // Enhanced error reporting
       let errorMessage = 'Failed to update member: ';
-      if (error.code === 4001) {
-        errorMessage += 'Transaction was rejected by user';
-      } else if (error.message.includes('execution reverted')) {
+      if (error.message.includes('KYC management rights')) {
+        errorMessage = error.message;
+      } else if (error.message.includes('revert')) {
         errorMessage +=
-          'Transaction was reverted by the contract. Check your permissions and parameters.';
+          'Transaction failed. Check your permissions and try again.';
+      } else if (error.code === 4001) {
+        errorMessage += 'Transaction rejected by user.';
       } else {
         errorMessage += error.message || 'Unknown error occurred';
       }
 
       alert(errorMessage);
-
-      // Log additional error details
-      if (error.receipt) {
-        console.error('Transaction receipt:', error.receipt);
-      }
-      if (error.reason) {
-        console.error('Revert reason:', error.reason);
-      }
     }
   }
 
