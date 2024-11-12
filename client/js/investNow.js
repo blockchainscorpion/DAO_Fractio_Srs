@@ -1,4 +1,4 @@
-// src/js/investNow.js
+import investmentModule from './modules/investment';
 
 function updateTotalInvestment() {
   const tokenCount = document.getElementById('tokenCount').value;
@@ -8,17 +8,32 @@ function updateTotalInvestment() {
     totalInvestment.toLocaleString();
 }
 
-function confirmInvestment() {
-  const tokenCount = document.getElementById('tokenCount').value;
-  const totalInvestment =
-    document.getElementById('totalInvestment').textContent;
-  alert(
-    `Confirming investment of ${tokenCount} tokens for $${totalInvestment}. Proceeding to payment...`
-  );
-  // Here you would typically redirect to a payment gateway or blockchain transaction
+async function confirmInvestment() {
+  try {
+    const tokenCount = document.getElementById('tokenCount').value;
+    const propertyId = new URLSearchParams(window.location.search).get('id');
+
+    // Use investment module to process investment
+    await investmentModule.invest({
+      propertyId,
+      amount: tokenCount,
+      options: {
+        // Additional options like slippage tolerance etc.
+      },
+    });
+
+    alert('Investment successful!');
+    window.location.href = 'yourEstate.html';
+  } catch (error) {
+    alert('Investment failed: ' + error.message);
+  }
 }
 
 function init() {
+  // Initialize investment module
+  investmentModule.initialize().catch(console.error);
+
+  // Set up UI event listeners
   document
     .getElementById('tokenCount')
     .addEventListener('input', updateTotalInvestment);
