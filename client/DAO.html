@@ -2,16 +2,16 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fractio - DAO Governance</title>
-  <link rel="stylesheet" href="./css/dao.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fractio - DAO Governance</title>
+    <link rel="stylesheet" href="./css/dao.css" />
 
-  <!-- Web3 and Contract Config -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.2.2/web3.min.js"></script>
-  <script src="./js/config.js"></script>
+    <!-- Web3 and Contract Config -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.2.2/web3.min.js"></script>
+    <script src="./js/config.js"></script>
 
-  <!-- Test Module Import -->
+    <!-- Test Module Import -->
     <script type="module">
         import { Web3Setup } from './js/modules/core/web3Setup.js';
         import { ContractManager } from './js/modules/core/contractManager.js';
@@ -106,269 +106,269 @@
         }
 
         // DAO Testing Functions
-    class DAOTester {
-        constructor(contractManager) {
-            this.contractManager = contractManager;
-        }
-
-        /**
-         * Test member management functions
-         */
-        async testMemberManagement() {
-            try {
-                updateStatus('Testing member management...');
-                
-                // Get current user status
-                const member = await this.contractManager.call(
-                    'Governance', 
-                    'members', 
-                    [window.web3Setup.getCurrentAccount()]
-                );
-
-                updateDebugInfo({
-                    memberStatus: {
-                        isApproved: member.isApproved,
-                        hasPassedKYC: member.hasPassedKYC,
-                        votingPower: member.votingPower.toString()
-                    }
-                });
-
-                return member;
-            } catch (error) {
-                console.error('Member management test failed:', error);
-                throw error;
+        class DAOTester {
+            constructor(contractManager) {
+                this.contractManager = contractManager;
             }
-        }
 
-        /**
-         * Test proposal creation and retrieval
-         */
-        async testProposalCreation(description = "Test Proposal") {
-            try {
-                updateStatus('Creating test proposal...');
+            /**
+             * Test member management functions
+             */
+            async testMemberManagement() {
+                try {
+                    updateStatus('Testing member management...');
 
-                // Create proposal
-                const tx = await this.contractManager.send(
-                    'Governance',
-                    'createProposal',
-                    [description]
-                );
+                    // Get current user status
+                    const member = await this.contractManager.call(
+                        'Governance',
+                        'members',
+                        [window.web3Setup.getCurrentAccount()]
+                    );
 
-                // Get proposal count
-                const proposalCount = await this.contractManager.call(
-                    'Governance',
-                    'proposalCount'
-                );
+                    updateDebugInfo({
+                        memberStatus: {
+                            isApproved: member.isApproved,
+                            hasPassedKYC: member.hasPassedKYC,
+                            votingPower: member.votingPower.toString()
+                        }
+                    });
 
-                // Get latest proposal
-                const proposal = await this.contractManager.call(
-                    'Governance',
-                    'proposals',
-                    [proposalCount - 1]
-                );
-
-                updateDebugInfo({
-                    proposalCreated: {
-                        id: proposal.id.toString(),
-                        description: proposal.description,
-                        proposer: proposal.proposer,
-                        forVotes: proposal.forVotes.toString(),
-                        againstVotes: proposal.againstVotes.toString(),
-                        startTime: proposal.startTime.toString(),
-                        executed: proposal.executed
-                    }
-                });
-
-                return proposal;
-            } catch (error) {
-                console.error('Proposal creation test failed:', error);
-                throw error;
-            }
-        }
-
-        /**
-         * Test voting on a proposal
-         */
-        async testVoting(proposalId, support = true) {
-            try {
-                updateStatus(`Voting ${support ? 'for' : 'against'} proposal ${proposalId}...`);
-
-                // Vote on proposal
-                const tx = await this.contractManager.send(
-                    'Governance',
-                    'vote',
-                    [proposalId, support]
-                );
-
-                // Get updated proposal
-                const proposal = await this.contractManager.call(
-                    'Governance',
-                    'proposals',
-                    [proposalId]
-                );
-
-                updateDebugInfo({
-                    voteResult: {
-                        proposalId: proposalId.toString(),
-                        support,
-                        newForVotes: proposal.forVotes.toString(),
-                        newAgainstVotes: proposal.againstVotes.toString()
-                    }
-                });
-
-                return proposal;
-            } catch (error) {
-                console.error('Voting test failed:', error);
-                throw error;
-            }
-        }
-
-        /**
-         * Test token operations
-         */
-        async testTokenOperations() {
-            try {
-                updateStatus('Testing token operations...');
-
-                const account = window.web3Setup.getCurrentAccount();
-                
-                // Get token balance
-                const balance = await this.contractManager.call(
-                    'GovernanceToken',
-                    'balanceOf',
-                    [account]
-                );
-
-                // Get token details
-                const [name, symbol, totalSupply] = await Promise.all([
-                    this.contractManager.call('GovernanceToken', 'name'),
-                    this.contractManager.call('GovernanceToken', 'symbol'),
-                    this.contractManager.call('GovernanceToken', 'totalSupply')
-                ]);
-
-                updateDebugInfo({
-                    tokenInfo: {
-                        name,
-                        symbol,
-                        totalSupply: totalSupply.toString(),
-                        userBalance: balance.toString()
-                    }
-                });
-
-                return { name, symbol, totalSupply, balance };
-            } catch (error) {
-                console.error('Token operations test failed:', error);
-                throw error;
-            }
-        }
-
-        /**
-         * Test delegation
-         */
-        async testDelegation(delegatee) {
-            try {
-                updateStatus(`Delegating voting power to ${delegatee}...`);
-
-                // Delegate voting power
-                const tx = await this.contractManager.send(
-                    'Governance',
-                    'delegate',
-                    [delegatee]
-                );
-
-                // Get updated voting power
-                const votingPower = await this.contractManager.call(
-                    'Governance',
-                    'votingPower',
-                    [window.web3Setup.getCurrentAccount()]
-                );
-
-                updateDebugInfo({
-                    delegation: {
-                        delegatee,
-                        newVotingPower: votingPower.toString()
-                    }
-                });
-
-                return { delegatee, votingPower };
-            } catch (error) {
-                console.error('Delegation test failed:', error);
-                throw error;
-            }
-        }
-
-        /**
-         * Test DAO stats
-         */
-        async testDAOStats() {
-            try {
-                updateStatus('Fetching DAO stats...');
-
-                // Get various DAO stats
-                const [
-                    totalMembers,
-                    proposalCount,
-                    votingPeriod,
-                    quorumPercentage
-                ] = await Promise.all([
-                    this.getTotalMembers(),
-                    this.contractManager.call('Governance', 'proposalCount'),
-                    this.contractManager.call('Governance', 'votingPeriod'),
-                    this.contractManager.call('Governance', 'quorumPercentage')
-                ]);
-
-                updateDebugInfo({
-                    daoStats: {
-                        totalMembers: totalMembers.toString(),
-                        proposalCount: proposalCount.toString(),
-                        votingPeriod: votingPeriod.toString(),
-                        quorumPercentage: quorumPercentage.toString()
-                    }
-                });
-
-                return {
-                    totalMembers,
-                    proposalCount,
-                    votingPeriod,
-                    quorumPercentage
-                };
-            } catch (error) {
-                console.error('DAO stats test failed:', error);
-                throw error;
-            }
-        }
-
-        /**
-         * Helper to get total members
-         */
-        async getTotalMembers() {
-            let memberCount = 0;
-            try {
-                while (true) {
-                    await this.contractManager.call('Governance', 'memberList', [memberCount]);
-                    memberCount++;
+                    return member;
+                } catch (error) {
+                    console.error('Member management test failed:', error);
+                    throw error;
                 }
-            } catch {
-                // End of list reached
             }
-            return memberCount;
-        }
-    }
 
-    // Make DAOTester available globally
-    window.initDAOTester = async () => {
-        if (!window.contractManager) {
-            throw new Error('Contract manager not initialized');
+            /**
+             * Test proposal creation and retrieval
+             */
+            async testProposalCreation(description = "Test Proposal") {
+                try {
+                    updateStatus('Creating test proposal...');
+
+                    // Create proposal
+                    const tx = await this.contractManager.send(
+                        'Governance',
+                        'createProposal',
+                        [description]
+                    );
+
+                    // Get proposal count
+                    const proposalCount = await this.contractManager.call(
+                        'Governance',
+                        'proposalCount'
+                    );
+
+                    // Get latest proposal
+                    const proposal = await this.contractManager.call(
+                        'Governance',
+                        'proposals',
+                        [proposalCount - 1]
+                    );
+
+                    updateDebugInfo({
+                        proposalCreated: {
+                            id: proposal.id.toString(),
+                            description: proposal.description,
+                            proposer: proposal.proposer,
+                            forVotes: proposal.forVotes.toString(),
+                            againstVotes: proposal.againstVotes.toString(),
+                            startTime: proposal.startTime.toString(),
+                            executed: proposal.executed
+                        }
+                    });
+
+                    return proposal;
+                } catch (error) {
+                    console.error('Proposal creation test failed:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Test voting on a proposal
+             */
+            async testVoting(proposalId, support = true) {
+                try {
+                    updateStatus(`Voting ${support ? 'for' : 'against'} proposal ${proposalId}...`);
+
+                    // Vote on proposal
+                    const tx = await this.contractManager.send(
+                        'Governance',
+                        'vote',
+                        [proposalId, support]
+                    );
+
+                    // Get updated proposal
+                    const proposal = await this.contractManager.call(
+                        'Governance',
+                        'proposals',
+                        [proposalId]
+                    );
+
+                    updateDebugInfo({
+                        voteResult: {
+                            proposalId: proposalId.toString(),
+                            support,
+                            newForVotes: proposal.forVotes.toString(),
+                            newAgainstVotes: proposal.againstVotes.toString()
+                        }
+                    });
+
+                    return proposal;
+                } catch (error) {
+                    console.error('Voting test failed:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Test token operations
+             */
+            async testTokenOperations() {
+                try {
+                    updateStatus('Testing token operations...');
+
+                    const account = window.web3Setup.getCurrentAccount();
+
+                    // Get token balance
+                    const balance = await this.contractManager.call(
+                        'GovernanceToken',
+                        'balanceOf',
+                        [account]
+                    );
+
+                    // Get token details
+                    const [name, symbol, totalSupply] = await Promise.all([
+                        this.contractManager.call('GovernanceToken', 'name'),
+                        this.contractManager.call('GovernanceToken', 'symbol'),
+                        this.contractManager.call('GovernanceToken', 'totalSupply')
+                    ]);
+
+                    updateDebugInfo({
+                        tokenInfo: {
+                            name,
+                            symbol,
+                            totalSupply: totalSupply.toString(),
+                            userBalance: balance.toString()
+                        }
+                    });
+
+                    return { name, symbol, totalSupply, balance };
+                } catch (error) {
+                    console.error('Token operations test failed:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Test delegation
+             */
+            async testDelegation(delegatee) {
+                try {
+                    updateStatus(`Delegating voting power to ${delegatee}...`);
+
+                    // Delegate voting power
+                    const tx = await this.contractManager.send(
+                        'Governance',
+                        'delegate',
+                        [delegatee]
+                    );
+
+                    // Get updated voting power
+                    const votingPower = await this.contractManager.call(
+                        'Governance',
+                        'votingPower',
+                        [window.web3Setup.getCurrentAccount()]
+                    );
+
+                    updateDebugInfo({
+                        delegation: {
+                            delegatee,
+                            newVotingPower: votingPower.toString()
+                        }
+                    });
+
+                    return { delegatee, votingPower };
+                } catch (error) {
+                    console.error('Delegation test failed:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Test DAO stats
+             */
+            async testDAOStats() {
+                try {
+                    updateStatus('Fetching DAO stats...');
+
+                    // Get various DAO stats
+                    const [
+                        totalMembers,
+                        proposalCount,
+                        votingPeriod,
+                        quorumPercentage
+                    ] = await Promise.all([
+                        this.getTotalMembers(),
+                        this.contractManager.call('Governance', 'proposalCount'),
+                        this.contractManager.call('Governance', 'votingPeriod'),
+                        this.contractManager.call('Governance', 'quorumPercentage')
+                    ]);
+
+                    updateDebugInfo({
+                        daoStats: {
+                            totalMembers: totalMembers.toString(),
+                            proposalCount: proposalCount.toString(),
+                            votingPeriod: votingPeriod.toString(),
+                            quorumPercentage: quorumPercentage.toString()
+                        }
+                    });
+
+                    return {
+                        totalMembers,
+                        proposalCount,
+                        votingPeriod,
+                        quorumPercentage
+                    };
+                } catch (error) {
+                    console.error('DAO stats test failed:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Helper to get total members
+             */
+            async getTotalMembers() {
+                let memberCount = 0;
+                try {
+                    while (true) {
+                        await this.contractManager.call('Governance', 'memberList', [memberCount]);
+                        memberCount++;
+                    }
+                } catch {
+                    // End of list reached
+                }
+                return memberCount;
+            }
         }
-        window.daoTester = new DAOTester(window.contractManager);
-        console.log('DAO Tester initialized');
-        return window.daoTester;
-    };
+
+        // Make DAOTester available globally
+        window.initDAOTester = async () => {
+            if (!window.contractManager) {
+                throw new Error('Contract manager not initialized');
+            }
+            window.daoTester = new DAOTester(window.contractManager);
+            console.log('DAO Tester initialized');
+            return window.daoTester;
+        };
 
         // Wait for DOM and initialize
         window.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, starting initialization...');
-            
+
             initializeManagers()
                 .then(managers => {
                     console.log('Successfully initialized managers:', managers);
@@ -383,7 +383,7 @@
         window.testContractCall = async (contractName, method, ...args) => {
             try {
                 const result = await window.contractManager.call(contractName, method, args);
-                console.log(`Call to ${contractName}.${method} result:`, 
+                console.log(`Call to ${contractName}.${method} result:`,
                     typeof result === 'bigint' ? result.toString() : result
                 );
                 return result;
@@ -402,16 +402,29 @@
             font-family: monospace;
             white-space: pre-line;
         }
+
+        .debug-section {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .debug-section h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
         .status-error {
             background-color: #ffebee;
             color: #c62828;
             border: 1px solid #ef9a9a;
         }
+
         .status-success {
             background-color: #e8f5e9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
         }
+
         #debugPanel {
             margin: 20px;
             padding: 20px;
@@ -419,17 +432,20 @@
             border-radius: 4px;
             font-family: monospace;
         }
+
         #debugInfo {
             overflow-x: auto;
             white-space: pre-wrap;
             word-break: break-all;
         }
+
         .debug-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 10px;
         }
+
         .debug-buttons button {
             padding: 8px 16px;
             border-radius: 4px;
@@ -438,6 +454,7 @@
             cursor: pointer;
             transition: all 0.3s;
         }
+
         .debug-buttons button:hover {
             background: #eee;
         }
@@ -445,141 +462,174 @@
 </head>
 
 <body>
-  <header>
-    <div id="connectionStatus">Initializing...</div>
-    <nav class="navbar">
-      <div class="logo">
-        <img src="./img/IMG_5974.png" alt="Fractio logo" />
-        <span>Fractio</span>
-      </div>
-      <div class="user-menu">
-        <span>Edward Cooper</span>
-        <img src="./img/IMG_5974.png" alt="User avatar" />
-      </div>
-    </nav>
-  </header>
+    <header>
+        <div id="connectionStatus">Initializing...</div>
+        <nav class="navbar">
+            <div class="logo">
+                <img src="./img/IMG_5974.png" alt="Fractio logo" />
+                <span>Fractio</span>
+            </div>
+            <div class="user-menu">
+                <span>Edward Cooper</span>
+                <img src="./img/IMG_5974.png" alt="User avatar" />
+            </div>
+        </nav>
+    </header>
 
-  <div class="layout">
     <div class="layout">
-      <aside class="sidebar">
-        <div class="sidebar-item">
-          <a href="./index.html">Marketplace</a>
+        <div class="layout">
+            <aside class="sidebar">
+                <div class="sidebar-item">
+                    <a href="./index.html">Marketplace</a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="./yourEstate.html">Your Estate</a>
+                </div>
+                <div class="sidebar-item active">
+                    <a href="./DAO.html">DAO</a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="./settings.html">Settings</a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="./wallet.html">Wallet</a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="./newListings.html">New listings</a>
+                </div>
+            </aside>
         </div>
-        <div class="sidebar-item">
-          <a href="./yourEstate.html">Your Estate</a>
-        </div>
-        <div class="sidebar-item active">
-          <a href="./DAO.html">DAO</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="./settings.html">Settings</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="./wallet.html">Wallet</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="./newListings.html">New listings</a>
-        </div>
-      </aside>
+
+        <main class="main-content">
+            <div class="dao-container">
+                <div class="dao-header">
+                    <h1>DAO Governance</h1>
+                </div>
+
+                <div class="dao-stats">
+                    <div class="stat-card">
+                        <div class="stat-title">Total Members</div>
+                        <div id="totalMembers" class="stat-value">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Active Proposals</div>
+                        <div id="activeProposals" class="stat-value">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Your Voting Power</div>
+                        <div id="votingPower" class="stat-value">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Quorum Percentage</div>
+                        <div id="quorumPercentage" class="stat-value">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="dao-sections">
+                    <section class="dao-section">
+                        <h2>Active Proposals</h2>
+                        <div id="proposalsList"></div>
+                    </section>
+
+                    <section class="dao-section">
+                        <h2>Recent Votes</h2>
+                        <div id="votesList"></div>
+                    </section>
+
+                    <section class="dao-section">
+                        <h2>Create New Proposal</h2>
+                        <form id="createProposalForm">
+                            <div class="form-group">
+                                <label for="proposalTitle">Title:</label>
+                                <input type="text" id="proposalTitle" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="proposalDescription">Description:</label>
+                                <textarea id="proposalDescription" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                Create Proposal
+                            </button>
+                        </form>
+                    </section>
+
+                    <section class="dao-section delegate-section">
+                        <h2>Delegate Your Voting Power</h2>
+                        <form id="delegateForm">
+                            <div class="form-group">
+                                <label for="delegateAddress">Delegate Address:</label>
+                                <input type="text" id="delegateAddress" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Delegate</button>
+                        </form>
+                    </section>
+
+                    <!-- Enhanced Debug Panel -->
+                    <div id="debugPanel">
+                        <h3>Debug Information</h3>
+                        <pre id="debugInfo">Waiting for initialization...</pre>
+
+                        <div class="debug-section">
+                            <h4>Basic Tests</h4>
+                            <div class="debug-buttons">
+                                <button onclick="window.location.reload()">Reload Page</button>
+                                <button onclick="window.initDAOTester()">Initialize Tester</button>
+                                <button onclick="console.log(window.daoTester)">Log DAO Tester</button>
+                            </div>
+                        </div>
+
+                        <div class="debug-section">
+                            <h4>Member Management</h4>
+                            <div class="debug-buttons">
+                                <button onclick="window.daoTester?.testMemberManagement()">Check Member Status</button>
+                                <button onclick="window.daoTester?.testDAOStats()">Check DAO Stats</button>
+                            </div>
+                        </div>
+
+                        <div class="debug-section">
+                            <h4>Proposal & Voting</h4>
+                            <div class="debug-buttons">
+                                <button
+                                    onclick="window.daoTester?.testProposalCreation('Test Proposal ' + Date.now())">Create
+                                    Proposal</button>
+                                <button onclick="window.daoTester?.testVoting(prompt('Enter proposal ID:'), true)">Vote
+                                    For</button>
+                                <button onclick="window.daoTester?.testVoting(prompt('Enter proposal ID:'), false)">Vote
+                                    Against</button>
+                            </div>
+                        </div>
+
+                        <div class="debug-section">
+                            <h4>Token Operations</h4>
+                            <div class="debug-buttons">
+                                <button onclick="window.daoTester?.testTokenOperations()">Check Token Info</button>
+                                <button
+                                    onclick="window.daoTester?.testDelegation(prompt('Enter delegate address:'))">Delegate
+                                    Voting Power</button>
+                            </div>
+                        </div>
+                    </div>
+        </main>
     </div>
 
-    <main class="main-content">
-      <div class="dao-container">
-        <div class="dao-header">
-          <h1>DAO Governance</h1>
-        </div>
-
-        <div class="dao-stats">
-          <div class="stat-card">
-            <div class="stat-title">Total Members</div>
-            <div id="totalMembers" class="stat-value">Loading...</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Active Proposals</div>
-            <div id="activeProposals" class="stat-value">Loading...</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Your Voting Power</div>
-            <div id="votingPower" class="stat-value">Loading...</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Quorum Percentage</div>
-            <div id="quorumPercentage" class="stat-value">Loading...</div>
-          </div>
-        </div>
-
-        <div class="dao-sections">
-          <section class="dao-section">
-            <h2>Active Proposals</h2>
-            <div id="proposalsList"></div>
-          </section>
-
-          <section class="dao-section">
-            <h2>Recent Votes</h2>
-            <div id="votesList"></div>
-          </section>
-
-          <section class="dao-section">
-            <h2>Create New Proposal</h2>
-            <form id="createProposalForm">
-              <div class="form-group">
-                <label for="proposalTitle">Title:</label>
-                <input type="text" id="proposalTitle" required />
-              </div>
-              <div class="form-group">
-                <label for="proposalDescription">Description:</label>
-                <textarea id="proposalDescription" required></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">
-                Create Proposal
-              </button>
-            </form>
-          </section>
-
-          <section class="dao-section delegate-section">
-            <h2>Delegate Your Voting Power</h2>
-            <form id="delegateForm">
-              <div class="form-group">
-                <label for="delegateAddress">Delegate Address:</label>
-                <input type="text" id="delegateAddress" required />
-              </div>
-              <button type="submit" class="btn btn-primary">Delegate</button>
-            </form>
-          </section>
-
-          <!-- Debug Panel -->
-          <div id="debugPanel">
-            <h3>Debug Information</h3>
-            <pre id="debugInfo">Waiting for initialization...</pre>
-            <div class="debug-buttons" style="margin-top: 10px;">
-              <button onclick="window.location.reload()">Reload Page</button>
-              <button onclick="console.log(window.web3Setup)">Log Web3Setup Instance</button>
-              <button onclick="console.log(window.contractManager)">Log ContractManager Instance</button>
-              <button onclick="window.testContractCall('Governance', 'votingPeriod')">Test Voting Period</button>
-              <button onclick="window.testContractCall('GovernanceToken', 'name')">Test Token Name</button>
-            </div>
-          </div>
-    </main>
-  </div>
-
-  <!-- <script src="js/dao.js" type="module"></script> -->
+    <!-- <script src="js/dao.js" type="module"></script> -->
 
 
 
-  <!-- Load Web3 first as it's needed by our modules -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script> -->
+    <!-- Load Web3 first as it's needed by our modules -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script> -->
 
-  <!-- Load configuration next as it contains contract addresses and ABIs -->
-  <!-- <script src="./js/config.js"></script> -->
+    <!-- Load configuration next as it contains contract addresses and ABIs -->
+    <!-- <script src="./js/config.js"></script> -->
 
-  <!-- Load core modules bundle -->
-  <!-- <script type="module" src="./client/js/modules/core/index.js"></script> -->
+    <!-- Load core modules bundle -->
+    <!-- <script type="module" src="./client/js/modules/core/index.js"></script> -->
 
-  <!-- Load DAO modules bundle -->
-  <!-- <script type="module" src="./client/js/modules/dao/index.js"></script> -->
+    <!-- Load DAO modules bundle -->
+    <!-- <script type="module" src="./client/js/modules/dao/index.js"></script> -->
 
-  <!-- <script src="./js/dao-integration.js"></script> -->
-  <!-- <script src="./js/contract-integration.js"></script> -->
+    <!-- <script src="./js/dao-integration.js"></script> -->
+    <!-- <script src="./js/contract-integration.js"></script> -->
 
 
 
