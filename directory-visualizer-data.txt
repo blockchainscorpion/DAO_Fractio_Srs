@@ -1,0 +1,377 @@
+DAO_FRACTIO
+ ┣ .git
+ ┃  ┣ hooks
+ ┃  ┃  ┣ applypatch-msg.sample
+ ┃  ┃  ┣ commit-msg.sample
+ ┃  ┃  ┣ fsmonitor-watchman.sample
+ ┃  ┃  ┣ post-update.sample
+ ┃  ┃  ┣ pre-applypatch.sample
+ ┃  ┃  ┣ pre-commit.sample
+ ┃  ┃  ┣ pre-merge-commit.sample
+ ┃  ┃  ┣ pre-push.sample
+ ┃  ┃  ┣ pre-rebase.sample
+ ┃  ┃  ┣ pre-receive.sample
+ ┃  ┃  ┣ prepare-commit-msg.sample
+ ┃  ┃  ┣ push-to-checkout.sample
+ ┃  ┃  ┣ sendemail-validate.sample
+ ┃  ┃  ┗ update.sample
+ ┃  ┣ info
+ ┃  ┃  ┗ exclude
+ ┃  ┣ logs
+ ┃  ┃  ┣ refs
+ ┃  ┃  ┃  ┣ heads
+ ┃  ┃  ┃  ┃  ┗ main
+ ┃  ┃  ┃  ┗ remotes
+ ┃  ┃  ┃     ┗ origin
+ ┃  ┃  ┃        ┗ main
+ ┃  ┃  ┗ HEAD
+ ┃  ┣ objects
+ ┃  ┃  ┣ 01
+ ┃  ┃  ┃  ┗ 1c4776dfeae1f6711287f07906eb74d1ba0fe4
+ ┃  ┃  ┣ 02
+ ┃  ┃  ┃  ┗ a5a38854db016b813bdeb0f1955e6e310c7bb0
+ ┃  ┃  ┣ 03
+ ┃  ┃  ┃  ┗ 91a95e8cc9be4d03ec4047c6fe842539dcad6f
+ ┃  ┃  ┣ 06
+ ┃  ┃  ┃  ┗ 46a4c40e370df39cc4a3d157a47459dcfb698f
+ ┃  ┃  ┣ 08
+ ┃  ┃  ┃  ┗ f0551f3246ccedfdc63767c0388b0a2388af0a
+ ┃  ┃  ┣ 0a
+ ┃  ┃  ┃  ┗ 37bee27798e2d8495def44a483a5409ba7952f
+ ┃  ┃  ┣ 0e
+ ┃  ┃  ┃  ┣ 8c1e47190b6afebdd2d22cac6f404c7e715302
+ ┃  ┃  ┃  ┗ b2be220387343e29edc96b65586910bc5e023b
+ ┃  ┃  ┣ 13
+ ┃  ┃  ┃  ┗ 08b771497873e77c98d3518db3e3a605a3c1e9
+ ┃  ┃  ┣ 1c
+ ┃  ┃  ┃  ┗ 0b64c3170bfa9715810be5b53b21e2aabe7bdf
+ ┃  ┃  ┣ 20
+ ┃  ┃  ┃  ┗ 6448e8b21e0c7a21f3215b7d6fba54e2e2c3ee
+ ┃  ┃  ┣ 22
+ ┃  ┃  ┃  ┗ 59f36d27b139cd71ba37629a0c7d3edccefe34
+ ┃  ┃  ┣ 25
+ ┃  ┃  ┃  ┗ 07b25ddea83f8b3e5a62f4ed1c7cf76c608f67
+ ┃  ┃  ┣ 28
+ ┃  ┃  ┃  ┣ 20979c6a096007266ec17efcd161ba8b2b3609
+ ┃  ┃  ┃  ┗ b086221b1469ea9de321859cc89cba00604314
+ ┃  ┃  ┣ 29
+ ┃  ┃  ┃  ┗ 4d9ec07427ad679680cf64259cce3a2c0bb9bd
+ ┃  ┃  ┣ 2a
+ ┃  ┃  ┃  ┗ 6384541cf259e67ea5ea26997f8e702172ff16
+ ┃  ┃  ┣ 2b
+ ┃  ┃  ┃  ┗ b68314b98e4c03635b9ceec9e7d358869b18cd
+ ┃  ┃  ┣ 2c
+ ┃  ┃  ┃  ┗ 118dd068823b525f34cb178a6d97bacf557b7e
+ ┃  ┃  ┣ 31
+ ┃  ┃  ┃  ┗ 7582e23a24d38cbd14f996cd62eadc757e3d2e
+ ┃  ┃  ┣ 32
+ ┃  ┃  ┃  ┗ a91900542ca90eaaf7a463e06a2600e5be23dc
+ ┃  ┃  ┣ 37
+ ┃  ┃  ┃  ┗ c6582e258027d0583a4f01beedd904c328dc49
+ ┃  ┃  ┣ 38
+ ┃  ┃  ┃  ┣ 450f3f293ebe963ec24d77247881f885944473
+ ┃  ┃  ┃  ┣ d08de6d489c7fab5892dced6c2cc35911963b7
+ ┃  ┃  ┃  ┗ fe313f919607c479310e7a28593844c80a9d63
+ ┃  ┃  ┣ 39
+ ┃  ┃  ┃  ┣ 2a242e651d8e35261be1aac7ad47aa48c9c6b7
+ ┃  ┃  ┃  ┗ f354a95945113c5282bd8df5ff3cb8609309e8
+ ┃  ┃  ┣ 3f
+ ┃  ┃  ┃  ┗ 1f5c809ddd92f9147b5e57017297621cd8c625
+ ┃  ┃  ┣ 41
+ ┃  ┃  ┃  ┣ 52264c054286309c02ff23ba11c39b757abc7a
+ ┃  ┃  ┃  ┗ 715b139eb88edfdf7f5bc645038def9efd43bb
+ ┃  ┃  ┣ 42
+ ┃  ┃  ┃  ┗ bc48b5638aef12c274f5d26ffa55dad2234d70
+ ┃  ┃  ┣ 46
+ ┃  ┃  ┃  ┣ 308df8cae0fa055d47824b5169c77333c0675c
+ ┃  ┃  ┃  ┗ c72604c8f15c878a8927065cd470ec629bd5ba
+ ┃  ┃  ┣ 48
+ ┃  ┃  ┃  ┗ 912d244bbc262d8580451e1b3cacae7dcca11f
+ ┃  ┃  ┣ 49
+ ┃  ┃  ┃  ┗ dbbef31b718c339cd6c4814d0e2fecce7c7c54
+ ┃  ┃  ┣ 4a
+ ┃  ┃  ┃  ┗ e88c243e304a738a5aa4dddfdb22e1f5712cf1
+ ┃  ┃  ┣ 4c
+ ┃  ┃  ┃  ┗ c7cc7e33932c573f4104bbdb2c9c8dd7fb9931
+ ┃  ┃  ┣ 4d
+ ┃  ┃  ┃  ┗ cec9644d00a7c4f11eaa323f128dfba599dd34
+ ┃  ┃  ┣ 4e
+ ┃  ┃  ┃  ┗ 5dce8df2a9c4fa1f50e3a4239e3ea48e304665
+ ┃  ┃  ┣ 54
+ ┃  ┃  ┃  ┗ 5f0f3516cc9709ec226bf523860fbdc7745bff
+ ┃  ┃  ┣ 56
+ ┃  ┃  ┃  ┗ 3b0f7f06f448323f77b3ec1b20a35b4c34e71c
+ ┃  ┃  ┣ 57
+ ┃  ┃  ┃  ┗ e56b0e89114cbc70502b8bb34e67389f722544
+ ┃  ┃  ┣ 58
+ ┃  ┃  ┃  ┣ c73232df6f6c6397b45cd3948dddb4afa06654
+ ┃  ┃  ┃  ┗ ca3bb85a2135cc219b3910d8d5e68d3f8c76ae
+ ┃  ┃  ┣ 5d
+ ┃  ┃  ┃  ┗ 1209ea9fb43b198a18d485bf234eab09520345
+ ┃  ┃  ┣ 5e
+ ┃  ┃  ┃  ┣ a9516118522ba3ec47f5ef80c73f2cf876cabc
+ ┃  ┃  ┃  ┗ c88e46413873803d900297a14764f2a82f9770
+ ┃  ┃  ┣ 60
+ ┃  ┃  ┃  ┣ 08b0d3ddc538a96122514e54eecfef4c5f42d1
+ ┃  ┃  ┃  ┗ d376f952313e3cba5c37c3fedfbc8f43a7d9df
+ ┃  ┃  ┣ 63
+ ┃  ┃  ┃  ┣ 2aaa71161b7dc2986f60ef5f5461ed92d31dd3
+ ┃  ┃  ┃  ┣ 849cd682a365d518f009f7591562da7bbfa520
+ ┃  ┃  ┃  ┗ 864fbf4ac45143c7050deb784248f241436453
+ ┃  ┃  ┣ 6b
+ ┃  ┃  ┃  ┗ 896a0fbada631223bc57e43c66b89deeb83391
+ ┃  ┃  ┣ 6c
+ ┃  ┃  ┃  ┣ 760652e779dfae07987d231d77c8fe00fe1fd4
+ ┃  ┃  ┃  ┗ eee4939b68a36546d75156ad154dc72f540d45
+ ┃  ┃  ┣ 6e
+ ┃  ┃  ┃  ┗ c66b39d410dbb3650e5b4260dbf8ac733dce9f
+ ┃  ┃  ┣ 6f
+ ┃  ┃  ┃  ┗ 714b98783835d58114d5f78a19bd7c7226c020
+ ┃  ┃  ┣ 71
+ ┃  ┃  ┃  ┗ 1cf15e3d91d029c7ec8c11d3ae780e745273aa
+ ┃  ┃  ┣ 72
+ ┃  ┃  ┃  ┣ 42091ae6874884fc3f64f2900bdb484754fab7
+ ┃  ┃  ┃  ┗ 54242522f61f82bc82d2cde04da1301ada6ef2
+ ┃  ┃  ┣ 75
+ ┃  ┃  ┃  ┗ fb96c20105c11af09a134b3076d4c6a440a065
+ ┃  ┃  ┣ 76
+ ┃  ┃  ┃  ┗ e4e04ad545c890751c5549f05f93ad92e8cf90
+ ┃  ┃  ┣ 79
+ ┃  ┃  ┃  ┣ 0e9bb3bd57ad06ae8d7d81ab3a60f721fd2f6a
+ ┃  ┃  ┃  ┣ 0f68e8dcb9539f7154734341a768354c82d103
+ ┃  ┃  ┃  ┗ e36b445a9ad47121e07acbd1fd6ce49d8a36aa
+ ┃  ┃  ┣ 7a
+ ┃  ┃  ┃  ┣ 51c84a5599eb1495d2b21408b80d495b03d911
+ ┃  ┃  ┃  ┗ d5f0a50c30e8da422a3e277e476bb38fa3ab0c
+ ┃  ┃  ┣ 7c
+ ┃  ┃  ┃  ┗ 2648036294fde7da615e3530994b6d4b647b57
+ ┃  ┃  ┣ 7f
+ ┃  ┃  ┃  ┗ c67c77ca841bb9512cd7ae234010d87ab8c1c5
+ ┃  ┃  ┣ 80
+ ┃  ┃  ┃  ┗ cf0a971c6624c4b34de14b34169c258d924e53
+ ┃  ┃  ┣ 85
+ ┃  ┃  ┃  ┗ a73a256b3646787be0589ae17c622038fafa0f
+ ┃  ┃  ┣ 86
+ ┃  ┃  ┃  ┗ 2e2a89f1d8305b41acd4679df022ba75dd54fb
+ ┃  ┃  ┣ 89
+ ┃  ┃  ┃  ┗ 1446b919ff6db22eab6c721f49c96c2649d5cd
+ ┃  ┃  ┣ 8a
+ ┃  ┃  ┃  ┗ 74c494b684c2c9f2200dc02df93f52440dfddf
+ ┃  ┃  ┣ 8e
+ ┃  ┃  ┃  ┗ 90a7cea78b4436dd0b252e791feeda34f02d3c
+ ┃  ┃  ┣ 8f
+ ┃  ┃  ┃  ┣ 011bd94518ac83d6380092606a0a52494e46cc
+ ┃  ┃  ┃  ┗ 28dff50f51e7df261db12b624664fe06ebfee6
+ ┃  ┃  ┣ 90
+ ┃  ┃  ┃  ┗ 0fe5cf0e00a729a55b81cd076f9c319ac5602a
+ ┃  ┃  ┣ 91
+ ┃  ┃  ┃  ┗ 09fa36d69ce63b807fa06dd458917fbf61d8f8
+ ┃  ┃  ┣ 92
+ ┃  ┃  ┃  ┣ 4ae6b41f32796f0fc38969330bce2b2c2649db
+ ┃  ┃  ┃  ┗ 63d6a1d0b6fa36ee61497db56b0b8816dcdfb9
+ ┃  ┃  ┣ 94
+ ┃  ┃  ┃  ┗ 28b162f4d7356760932c8cdf7df3186983558b
+ ┃  ┃  ┣ 97
+ ┃  ┃  ┃  ┗ 3e149cdbfb1f07ad1885460a6e9cb616b4502a
+ ┃  ┃  ┣ 9c
+ ┃  ┃  ┃  ┗ 26143bfee6e4d5370ba76fa5c35aa7f1c7ad91
+ ┃  ┃  ┣ 9d
+ ┃  ┃  ┃  ┣ 0f7ab66bc9a7b1734f3ae54d91ec86ece66650
+ ┃  ┃  ┃  ┗ b4a8468424fd5f87f425597c42ddac4b8654db
+ ┃  ┃  ┣ 9e
+ ┃  ┃  ┃  ┗ b2ee2d1ec744b4ddfa081a9f3a8f55a5af3b7c
+ ┃  ┃  ┣ a0
+ ┃  ┃  ┃  ┣ 4f2c0e20b6ae0b3347262c5bb633b70584cced
+ ┃  ┃  ┃  ┗ f22b8a7af596c7c4d3a1395ed6cc0079b3302c
+ ┃  ┃  ┣ a1
+ ┃  ┃  ┃  ┗ 73d7c8dd13577f02a935c3c9480421f1d02923
+ ┃  ┃  ┣ a7
+ ┃  ┃  ┃  ┗ 26064fafec9bd609aeb1d0dc11c4e9a827e5b5
+ ┃  ┃  ┣ aa
+ ┃  ┃  ┃  ┣ 72d5fd5a988f5b1cb63b383e3d0a0a98bc20f8
+ ┃  ┃  ┃  ┗ 998360fe3bd9a5d26474acb648092f54e5ef98
+ ┃  ┃  ┣ ab
+ ┃  ┃  ┃  ┗ 08d24ae489a583805fa4f9d45fbaabcbfb2d60
+ ┃  ┃  ┣ ad
+ ┃  ┃  ┃  ┗ 550f4e5e3347b05051253b78345ae4adfc2e29
+ ┃  ┃  ┣ ae
+ ┃  ┃  ┃  ┗ 6d8db963b166c4bb5736cf5792e08a6ce25aae
+ ┃  ┃  ┣ b2
+ ┃  ┃  ┃  ┗ 4052bdc221c98aaece9172fd64ca75cfba2708
+ ┃  ┃  ┣ b4
+ ┃  ┃  ┃  ┗ bd7f9c49f932c43da43feacc25f254b9fbf28d
+ ┃  ┃  ┣ b6
+ ┃  ┃  ┃  ┗ 1c4fc26bf93781e3d444576158fa62bf9951cf
+ ┃  ┃  ┣ b8
+ ┃  ┃  ┃  ┗ 707346ffbf33f6f5f1fce557029dc05b1a0b50
+ ┃  ┃  ┣ b9
+ ┃  ┃  ┃  ┣ 137656308d95017bc97875de06ac465cdd8e72
+ ┃  ┃  ┃  ┣ ad216e97f4d71422f8a3a533395f7ddaedccb1
+ ┃  ┃  ┃  ┗ b3715d5429cd5c530d20e9ef327aba3a6134c6
+ ┃  ┃  ┣ ba
+ ┃  ┃  ┃  ┗ 946815be743ef39ec697976b08f3177a82402f
+ ┃  ┃  ┣ bc
+ ┃  ┃  ┃  ┗ fd89a62c519e8d10ba15c6b5062cfd43343eac
+ ┃  ┃  ┣ bf
+ ┃  ┃  ┃  ┗ 694bce19b8d5724f9caa036cc832f23e2deeac
+ ┃  ┃  ┣ c1
+ ┃  ┃  ┃  ┗ a839e148abd66af092f45d5b04f2eec641a8b8
+ ┃  ┃  ┣ c5
+ ┃  ┃  ┃  ┗ c4c91ad61a9dff9ed6dbf9754c8c2be7f6f252
+ ┃  ┃  ┣ c6
+ ┃  ┃  ┃  ┣ 388b2f23f44d66210827fc52a8b68ed5cce9ea
+ ┃  ┃  ┃  ┗ 70f6793c1fdf618e02bd48175726844882bf23
+ ┃  ┃  ┣ cc
+ ┃  ┃  ┃  ┗ 9a2e98e7874ac8742b671bc398f0e5c8a4ca07
+ ┃  ┃  ┣ ce
+ ┃  ┃  ┃  ┗ db2bbf7c1adf5982a00fb12fa8f44855ca2435
+ ┃  ┃  ┣ cf
+ ┃  ┃  ┃  ┗ 9c9bea779e6aca26ce1a402ad65810f8d0bee5
+ ┃  ┃  ┣ d2
+ ┃  ┃  ┃  ┣ 18eec8b622ca408b6fbfb1f76632e2c02d9e48
+ ┃  ┃  ┃  ┗ 5048a1df0f2eada59fa0f08001f77ace570845
+ ┃  ┃  ┣ d3
+ ┃  ┃  ┃  ┗ cbb77263db592fcc0c82e353c8d71a84fcd29c
+ ┃  ┃  ┣ d4
+ ┃  ┃  ┃  ┗ d2e1d64c976f9688c6cc1f0c2eef01bcb7bcee
+ ┃  ┃  ┣ d5
+ ┃  ┃  ┃  ┗ babb5f88eec8fef08b4e77438645bf0d9c37f5
+ ┃  ┃  ┣ d6
+ ┃  ┃  ┃  ┗ 3570c0184c0f1dd88240b6173ff85419bdfb4e
+ ┃  ┃  ┣ d7
+ ┃  ┃  ┃  ┗ 3ae9c44a9ebeedc5b37779e959d0fd8e443fe3
+ ┃  ┃  ┣ da
+ ┃  ┃  ┃  ┗ e9974297fb461e93ffe3d3825cb69c55436664
+ ┃  ┃  ┣ df
+ ┃  ┃  ┃  ┗ 30c22719fe52e9622c6488e0de7d3a59811b7d
+ ┃  ┃  ┣ e1
+ ┃  ┃  ┃  ┗ cb7b977e428a7191b26b62c8db0cb5479e82c0
+ ┃  ┃  ┣ e6
+ ┃  ┃  ┃  ┣ 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+ ┃  ┃  ┃  ┗ da122bcc178601fc4aefd033da877e5e0afade
+ ┃  ┃  ┣ e7
+ ┃  ┃  ┃  ┗ 1d6824e13dbfa79af86945317d21896022d2f3
+ ┃  ┃  ┣ e8
+ ┃  ┃  ┃  ┗ 7d06f91524ce519d5f88163a6fbaef4677839d
+ ┃  ┃  ┣ ea
+ ┃  ┃  ┃  ┗ bd23625b1016ce3f6530282a3bfd8d8bc380f4
+ ┃  ┃  ┣ ec
+ ┃  ┃  ┃  ┗ 82903cd5142c294e475d91c8551179f89cae6f
+ ┃  ┃  ┣ f0
+ ┃  ┃  ┃  ┗ ef1fa5c11498a296ec1b9266eb7dfba6834d73
+ ┃  ┃  ┣ f1
+ ┃  ┃  ┃  ┗ 3eca89e82d33248ba39c3e0b306110ec967289
+ ┃  ┃  ┣ f2
+ ┃  ┃  ┃  ┗ e45d440a6c43a4560ed853526d4ea987cda878
+ ┃  ┃  ┣ f5
+ ┃  ┃  ┃  ┗ 7eec7e43882f447c3b24234f70a42b0d3db5c9
+ ┃  ┃  ┣ f7
+ ┃  ┃  ┃  ┗ 27ff95ac4c59b78ddcec24126321d8fe22dff3
+ ┃  ┃  ┣ f9
+ ┃  ┃  ┃  ┗ b9b59a4371f21abdbc42d49b4959edce9cd6f4
+ ┃  ┃  ┣ ff
+ ┃  ┃  ┃  ┗ 54a787c4c3fe92aac8aa89599004e615a9bda7
+ ┃  ┃  ┣ info
+ ┃  ┃  ┗ pack
+ ┃  ┣ refs
+ ┃  ┃  ┣ heads
+ ┃  ┃  ┃  ┗ main
+ ┃  ┃  ┣ remotes
+ ┃  ┃  ┃  ┗ origin
+ ┃  ┃  ┃     ┗ main
+ ┃  ┃  ┗ tags
+ ┃  ┣ COMMIT_EDITMSG
+ ┃  ┣ config
+ ┃  ┣ description
+ ┃  ┣ FETCH_HEAD
+ ┃  ┣ HEAD
+ ┃  ┣ index
+ ┃  ┗ ORIG_HEAD
+ ┣ client
+ ┃  ┣ css
+ ┃  ┃  ┣ dao.css
+ ┃  ┃  ┣ investNow.css
+ ┃  ┃  ┣ manageInvestmentDetails.css
+ ┃  ┃  ┣ marketplace.css
+ ┃  ┃  ┣ newListings.css
+ ┃  ┃  ┣ settings.css
+ ┃  ┃  ┣ userManagement.css
+ ┃  ┃  ┣ viewInvestmentDetails.css
+ ┃  ┃  ┣ viewMore.css
+ ┃  ┃  ┣ wallet.css
+ ┃  ┃  ┗ yourEstate.css
+ ┃  ┣ img
+ ┃  ┃  ┗ IMG_5974.png
+ ┃  ┣ js
+ ┃  ┃  ┣ tests
+ ┃  ┃  ┃  ┣ helpers
+ ┃  ┃  ┃  ┣ daoTesting.js
+ ┃  ┃  ┃  ┗ TestRunner.js
+ ┃  ┃  ┣ config.js
+ ┃  ┃  ┣ contract-integration.js
+ ┃  ┃  ┣ dao-integration.js
+ ┃  ┃  ┣ dao.js
+ ┃  ┃  ┣ deposit.js
+ ┃  ┃  ┣ investNow.js
+ ┃  ┃  ┣ manageInvestmentDetails.js
+ ┃  ┃  ┣ marketplace.js
+ ┃  ┃  ┣ newListings.js
+ ┃  ┃  ┣ settings.js
+ ┃  ┃  ┣ transfer.js
+ ┃  ┃  ┣ userManagement.js
+ ┃  ┃  ┣ utility.js
+ ┃  ┃  ┣ viewInvestmentDetails.js
+ ┃  ┃  ┣ viewMore.js
+ ┃  ┃  ┣ wallet.js
+ ┃  ┃  ┣ withdraw.js
+ ┃  ┃  ┗ yourEstate.js
+ ┃  ┣ DAO.html
+ ┃  ┣ daoTest.html
+ ┃  ┣ deposit.html
+ ┃  ┣ index.html
+ ┃  ┣ investNow.html
+ ┃  ┣ manageInvestmentDetails.html
+ ┃  ┣ newListings.html
+ ┃  ┣ settings.html
+ ┃  ┣ stylez.css
+ ┃  ┣ transfer.html
+ ┃  ┣ userManagement.html
+ ┃  ┣ viewInvestmentDetails.html
+ ┃  ┣ viewMore.html
+ ┃  ┣ wallet.html
+ ┃  ┣ withdraw.html
+ ┃  ┗ yourEstate.html
+ ┣ contracts
+ ┃  ┣ .gitkeep
+ ┃  ┣ Governance.sol
+ ┃  ┣ GovernanceToken.sol
+ ┃  ┗ Migrations.sol
+ ┣ migrations
+ ┃  ┣ 1_initial_migration.js
+ ┃  ┗ 2_deploy_contracts.js
+ ┣ scripts
+ ┃  ┣ generate-config.js
+ ┃  ┗ test-frontend.js
+ ┣ test
+ ┃  ┣ .gitkeep
+ ┃  ┣ governance.test.js
+ ┃  ┗ GovernanceToken.test.js
+ ┣ truffle_logs
+ ┃  ┣ ganache-20241104-180247.log
+ ┃  ┣ ganache-20241104-180710.log
+ ┃  ┣ ganache-20241104-181401.log
+ ┃  ┣ ganache-20241104-183018.log
+ ┃  ┣ ganache-20241104-183111.log
+ ┃  ┣ ganache-20241105-113405.log
+ ┃  ┣ ganache-20241105-113952.log
+ ┃  ┣ ganache-20241105-124052.log
+ ┃  ┣ ganache-20241105-125853.log
+ ┃  ┣ ganache-20241105-195140.log
+ ┃  ┣ ganache-20241106-092338.log
+ ┃  ┣ ganache-20241107-091731.log
+ ┃  ┗ ganache-20241107-094437.log
+ ┣ .gitignore
+ ┣ package-lock.json
+ ┣ package.json
+ ┣ Readme.md
+ ┗ truffle-config.js

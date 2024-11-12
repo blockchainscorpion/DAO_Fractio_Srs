@@ -1,5 +1,3 @@
-// UserManagement.js - DAO Member Management Integration
-
 class DAOMemberManager {
   constructor() {
     this.governanceContract = null;
