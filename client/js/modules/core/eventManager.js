@@ -1,3 +1,4 @@
+import { EventEmitter } from './EventEmitter.js';
 /**
  * Manages contract event subscriptions
  */

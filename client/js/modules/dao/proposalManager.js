@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from '../core/EventEmitter.js';
 
 /**
  * Manages proposal-related functionality

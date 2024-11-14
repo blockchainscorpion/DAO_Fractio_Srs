@@ -1,3 +1,4 @@
+import { EventEmitter } from '../core/EventEmitter.js';
 /**
  * Core DAO management functionality
  */
@@ -22,10 +23,7 @@ export class DAOManager {
       this.tokenContract = this.contractManager.getContract('GovernanceToken');
 
       // Verify contract connections
-      await Promise.all([
-        this.contractManager.verifyContract('Governance', 'votingPeriod'),
-        this.contractManager.verifyContract('GovernanceToken', 'name'),
-      ]);
+      await this.contractManager.verifyContracts();
 
       // Get current account
       const accounts = await this.web3.eth.getAccounts();

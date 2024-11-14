@@ -1,641 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fractio - DAO Governance</title>
+
+    <!-- Core Libraries (only once) -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/config.js"></script>
+
+    <!-- Module Initialization -->
+    <script type="module" src="js/modules/dao/initialization.js"></script>
+
     <link rel="stylesheet" href="./css/dao.css" />
 
-    <!-- Web3 and Contract Config -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.2.2/web3.min.js"></script>
-    <script src="./js/config.js"></script>
+    <!-- User Interface -->
 
-    <!-- Test Module Import -->
-    <script type="module">
-        import { Web3Setup } from './js/modules/core/web3Setup.js';
-        import { ContractManager } from './js/modules/core/contractManager.js';
-
-        // Function to safely stringify values including BigInt
-        function safeStringify(obj) {
-            return JSON.stringify(obj, (key, value) => {
-                if (typeof value === 'bigint') {
-                    return value.toString();
-                }
-                if (typeof value === 'object' && value !== null) {
-                    const newObj = {};
-                    for (const k in value) {
-                        if (typeof value[k] === 'bigint') {
-                            newObj[k] = value[k].toString();
-                        } else {
-                            newObj[k] = value[k];
-                        }
-                    }
-                    return newObj;
-                }
-                return value;
-            }, 2);
-        }
-
-        // Function to update status with timestamp
-        function updateStatus(message, error = false) {
-            const timestamp = new Date().toLocaleTimeString();
-            const statusEl = document.getElementById('connectionStatus');
-            statusEl.textContent = `[${timestamp}] ${message}`;
-            statusEl.className = error ? 'status-error' : 'status-success';
-            console.log(`Status Update: ${message}`);
-        }
-
-        // Update debug info
-        function updateDebugInfo(info) {
-            const debugInfo = document.getElementById('debugInfo');
-            try {
-                debugInfo.textContent = safeStringify(info);
-            } catch (error) {
-                console.error('Error updating debug info:', error);
-                debugInfo.textContent = 'Error serializing debug info';
-            }
-        }
-
-        // Initialize all managers
-        async function initializeManagers() {
-            try {
-                console.log('Starting initialization...');
-                updateStatus('Starting initialization...');
-
-                // 1. Initialize Web3
-                const web3Setup = new Web3Setup();
-                await web3Setup.initializeWeb3();
-                const account = web3Setup.getCurrentAccount();
-                updateStatus(`Web3 initialized, account: ${account}`);
-
-                // 2. Initialize Contract Manager
-                const contractManager = new ContractManager(web3Setup.getWeb3Instance());
-                await contractManager.initialize(account);
-                updateStatus('Contract manager initialized');
-
-                // Store instances for debugging
-                window.web3Setup = web3Setup;
-                window.contractManager = contractManager;
-
-                // Get chain ID as number
-                const chainId = await web3Setup.getWeb3Instance().eth.getChainId();
-
-                // Update debug info with safe values
-                updateDebugInfo({
-                    account: account,
-                    chainId: chainId,
-                    governanceAddress: window.CONFIG.GOVERNANCE_ADDRESS,
-                    tokenAddress: window.CONFIG.TOKEN_ADDRESS
-                });
-
-                // Test contract calls with safe value handling
-                const votingPeriod = await contractManager.call('Governance', 'votingPeriod');
-                const tokenName = await contractManager.call('GovernanceToken', 'name');
-
-                updateStatus(
-                    `Connected: ${account}\nToken: ${tokenName}\nVoting Period: ${votingPeriod.toString()}s`
-                );
-
-                return { web3Setup, contractManager };
-            } catch (error) {
-                console.error('Initialization error:', error);
-                updateStatus(`Error: ${error.message}`, true);
-                throw error;
-            }
-        }
-
-        // DAO Testing Functions
-        class DAOTester {
-            constructor(contractManager) {
-                this.contractManager = contractManager;
-            }
-
-            /**
-             * Test member management functions
-             */
-            async testMemberManagement() {
-                try {
-                    updateStatus('Testing member management...');
-
-                    // Get current user status
-                    const member = await this.contractManager.call(
-                        'Governance',
-                        'members',
-                        [window.web3Setup.getCurrentAccount()]
-                    );
-
-                    updateDebugInfo({
-                        memberStatus: {
-                            isApproved: member.isApproved,
-                            hasPassedKYC: member.hasPassedKYC,
-                            votingPower: member.votingPower.toString()
-                        }
-                    });
-
-                    return member;
-                } catch (error) {
-                    console.error('Member management test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Test proposal creation and retrieval
-             */
-            async testProposalCreation(description = "Test Proposal") {
-                try {
-                    updateStatus('Creating test proposal...');
-
-                    // Create proposal
-                    const tx = await this.contractManager.send(
-                        'Governance',
-                        'createProposal',
-                        [description]
-                    );
-
-                    // Get proposal count
-                    const proposalCount = await this.contractManager.call(
-                        'Governance',
-                        'proposalCount'
-                    );
-
-                    // Get latest proposal
-                    const proposal = await this.contractManager.call(
-                        'Governance',
-                        'proposals',
-                        [proposalCount - 1]
-                    );
-
-                    updateDebugInfo({
-                        proposalCreated: {
-                            id: proposal.id.toString(),
-                            description: proposal.description,
-                            proposer: proposal.proposer,
-                            forVotes: proposal.forVotes.toString(),
-                            againstVotes: proposal.againstVotes.toString(),
-                            startTime: proposal.startTime.toString(),
-                            executed: proposal.executed
-                        }
-                    });
-
-                    return proposal;
-                } catch (error) {
-                    console.error('Proposal creation test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Test voting on a proposal
-             */
-            async testVoting(proposalId, support = true) {
-                try {
-                    updateStatus(`Voting ${support ? 'for' : 'against'} proposal ${proposalId}...`);
-
-                    // Vote on proposal
-                    const tx = await this.contractManager.send(
-                        'Governance',
-                        'vote',
-                        [proposalId, support]
-                    );
-
-                    // Get updated proposal
-                    const proposal = await this.contractManager.call(
-                        'Governance',
-                        'proposals',
-                        [proposalId]
-                    );
-
-                    updateDebugInfo({
-                        voteResult: {
-                            proposalId: proposalId.toString(),
-                            support,
-                            newForVotes: proposal.forVotes.toString(),
-                            newAgainstVotes: proposal.againstVotes.toString()
-                        }
-                    });
-
-                    return proposal;
-                } catch (error) {
-                    console.error('Voting test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Test token operations
-             */
-            async testTokenOperations() {
-                try {
-                    updateStatus('Testing token operations...');
-
-                    const account = window.web3Setup.getCurrentAccount();
-
-                    // Get token balance
-                    const balance = await this.contractManager.call(
-                        'GovernanceToken',
-                        'balanceOf',
-                        [account]
-                    );
-
-                    // Get token details
-                    const [name, symbol, totalSupply] = await Promise.all([
-                        this.contractManager.call('GovernanceToken', 'name'),
-                        this.contractManager.call('GovernanceToken', 'symbol'),
-                        this.contractManager.call('GovernanceToken', 'totalSupply')
-                    ]);
-
-                    updateDebugInfo({
-                        tokenInfo: {
-                            name,
-                            symbol,
-                            totalSupply: totalSupply.toString(),
-                            userBalance: balance.toString()
-                        }
-                    });
-
-                    return { name, symbol, totalSupply, balance };
-                } catch (error) {
-                    console.error('Token operations test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Test delegation
-             */
-            async testDelegation(delegatee) {
-                try {
-                    updateStatus(`Delegating voting power to ${delegatee}...`);
-
-                    // Delegate voting power
-                    const tx = await this.contractManager.send(
-                        'Governance',
-                        'delegate',
-                        [delegatee]
-                    );
-
-                    // Get updated voting power
-                    const votingPower = await this.contractManager.call(
-                        'Governance',
-                        'votingPower',
-                        [window.web3Setup.getCurrentAccount()]
-                    );
-
-                    updateDebugInfo({
-                        delegation: {
-                            delegatee,
-                            newVotingPower: votingPower.toString()
-                        }
-                    });
-
-                    return { delegatee, votingPower };
-                } catch (error) {
-                    console.error('Delegation test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Test DAO stats
-             */
-            async testDAOStats() {
-                try {
-                    updateStatus('Fetching DAO stats...');
-
-                    // Get various DAO stats
-                    const [
-                        totalMembers,
-                        proposalCount,
-                        votingPeriod,
-                        quorumPercentage
-                    ] = await Promise.all([
-                        this.getTotalMembers(),
-                        this.contractManager.call('Governance', 'proposalCount'),
-                        this.contractManager.call('Governance', 'votingPeriod'),
-                        this.contractManager.call('Governance', 'quorumPercentage')
-                    ]);
-
-                    updateDebugInfo({
-                        daoStats: {
-                            totalMembers: totalMembers.toString(),
-                            proposalCount: proposalCount.toString(),
-                            votingPeriod: votingPeriod.toString(),
-                            quorumPercentage: quorumPercentage.toString()
-                        }
-                    });
-
-                    return {
-                        totalMembers,
-                        proposalCount,
-                        votingPeriod,
-                        quorumPercentage
-                    };
-                } catch (error) {
-                    console.error('DAO stats test failed:', error);
-                    throw error;
-                }
-            }
-
-            /**
-             * Helper to get total members
-             */
-            async getTotalMembers() {
-                let memberCount = 0;
-                try {
-                    while (true) {
-                        await this.contractManager.call('Governance', 'memberList', [memberCount]);
-                        memberCount++;
-                    }
-                } catch {
-                    // End of list reached
-                }
-                return memberCount;
-            }
-        }
-
-        // Make DAOTester available globally
-        window.initDAOTester = async () => {
-            if (!window.contractManager) {
-                throw new Error('Contract manager not initialized');
-            }
-            window.daoTester = new DAOTester(window.contractManager);
-            console.log('DAO Tester initialized');
-            return window.daoTester;
-        };
-
-        // Wait for DOM and initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, starting initialization...');
-
-            initializeManagers()
-                .then(managers => {
-                    console.log('Successfully initialized managers:', managers);
-                })
-                .catch(error => {
-                    console.error('Failed to initialize managers:', error);
-                    updateStatus(`Initialization failed: ${error.message}`, true);
-                });
-        });
-
-        // Add test functions to window for debugging
-        window.testContractCall = async (contractName, method, ...args) => {
-            try {
-                const result = await window.contractManager.call(contractName, method, args);
-                console.log(`Call to ${contractName}.${method} result:`,
-                    typeof result === 'bigint' ? result.toString() : result
-                );
-                return result;
-            } catch (error) {
-                console.error(`Call to ${contractName}.${method} failed:`, error);
-                throw error;
-            }
-        };
-    </script>
-
-    <style>
-        #connectionStatus {
-            padding: 10px;
-            margin: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            white-space: pre-line;
-        }
-
-        .debug-section {
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-        }
-        .debug-section h4 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-
-        .status-error {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-        }
-
-        .status-success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-        }
-
-        #debugPanel {
-            margin: 20px;
-            padding: 20px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-
-        #debugInfo {
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .debug-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .debug-buttons button {
-            padding: 8px 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .debug-buttons button:hover {
-            background: #eee;
-        }
-    </style>
-</head>
-
-<body>
+    <link rel="stylesheet" href="./css/dao.css" />
+  </head>
+  <body>
     <header>
-        <div id="connectionStatus">Initializing...</div>
-        <nav class="navbar">
-            <div class="logo">
-                <img src="./img/IMG_5974.png" alt="Fractio logo" />
-                <span>Fractio</span>
-            </div>
-            <div class="user-menu">
-                <span>Edward Cooper</span>
-                <img src="./img/IMG_5974.png" alt="User avatar" />
-            </div>
-        </nav>
+      <!-- Navigation -->
+      <nav class="navbar">
+        <div class="logo">
+          <img src="./img/IMG_5974.png" alt="Fractio logo" />
+          <span>Fractio</span>
+        </div>
+        <div class="user-menu">
+          <span id="userAddress">Not Connected</span>
+          <img src="./img/IMG_5974.png" alt="User avatar" />
+        </div>
+      </nav>
     </header>
 
     <div class="layout">
-        <div class="layout">
-            <aside class="sidebar">
-                <div class="sidebar-item">
-                    <a href="./index.html">Marketplace</a>
+      <!-- Sidebar -->
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-item">
+            <a href="./index.html">Marketplace</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./yourEstate.html">Your Estate</a>
+          </div>
+          <div class="sidebar-item active">
+            <a href="./DAO.html">DAO</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./settings.html">Settings</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./wallet.html">Wallet</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="./newListings.html">New listings</a>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="dao-container">
+          <div class="dao-header">
+            <h1>DAO Governance</h1>
+          </div>
+
+          <div class="dao-stats">
+            <div class="stat-card">
+              <div class="stat-title">Total Members</div>
+              <div id="totalMembers" class="stat-value">Loading...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Active Proposals</div>
+              <div id="activeProposals" class="stat-value">Loading...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Your Voting Power</div>
+              <div id="votingPower" class="stat-value">Loading...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Quorum Percentage</div>
+              <div id="quorumPercentage" class="stat-value">Loading...</div>
+            </div>
+          </div>
+
+          <div class="dao-sections">
+            <!-- Proposal Section -->
+            <section class="dao-section">
+              <h2>Active Proposals</h2>
+              <div id="proposalsList"></div>
+            </section>
+
+            <!-- Voting History -->
+            <section class="dao-section">
+              <h2>Recent Votes</h2>
+              <div id="votesList"></div>
+            </section>
+
+            <!-- Create Proposal -->
+            <section class="dao-section">
+              <h2>Create New Proposal</h2>
+              <form id="createProposalForm">
+                <div class="form-group">
+                  <label for="proposalTitle">Title:</label>
+                  <input type="text" id="proposalTitle" required />
                 </div>
-                <div class="sidebar-item">
-                    <a href="./yourEstate.html">Your Estate</a>
+                <div class="form-group">
+                  <label for="proposalDescription">Description:</label>
+                  <textarea id="proposalDescription" required></textarea>
                 </div>
-                <div class="sidebar-item active">
-                    <a href="./DAO.html">DAO</a>
+                <button type="submit" class="btn btn-primary">
+                  Create Proposal
+                </button>
+              </form>
+            </section>
+
+            <!-- Delegation -->
+            <section class="dao-section delegate-section">
+              <h2>Delegate Your Voting Power</h2>
+              <form id="delegateForm">
+                <div class="form-group">
+                  <label for="delegateAddress">Delegate Address:</label>
+                  <input type="text" id="delegateAddress" required />
                 </div>
-                <div class="sidebar-item">
-                    <a href="./settings.html">Settings</a>
-                </div>
-                <div class="sidebar-item">
-                    <a href="./wallet.html">Wallet</a>
-                </div>
-                <div class="sidebar-item">
-                    <a href="./newListings.html">New listings</a>
-                </div>
-            </aside>
+                <button type="submit" class="btn btn-primary">Delegate</button>
+              </form>
+            </section>
+          </div>
         </div>
-
-        <main class="main-content">
-            <div class="dao-container">
-                <div class="dao-header">
-                    <h1>DAO Governance</h1>
-                </div>
-
-                <div class="dao-stats">
-                    <div class="stat-card">
-                        <div class="stat-title">Total Members</div>
-                        <div id="totalMembers" class="stat-value">Loading...</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Active Proposals</div>
-                        <div id="activeProposals" class="stat-value">Loading...</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Your Voting Power</div>
-                        <div id="votingPower" class="stat-value">Loading...</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Quorum Percentage</div>
-                        <div id="quorumPercentage" class="stat-value">Loading...</div>
-                    </div>
-                </div>
-
-                <div class="dao-sections">
-                    <section class="dao-section">
-                        <h2>Active Proposals</h2>
-                        <div id="proposalsList"></div>
-                    </section>
-
-                    <section class="dao-section">
-                        <h2>Recent Votes</h2>
-                        <div id="votesList"></div>
-                    </section>
-
-                    <section class="dao-section">
-                        <h2>Create New Proposal</h2>
-                        <form id="createProposalForm">
-                            <div class="form-group">
-                                <label for="proposalTitle">Title:</label>
-                                <input type="text" id="proposalTitle" required />
-                            </div>
-                            <div class="form-group">
-                                <label for="proposalDescription">Description:</label>
-                                <textarea id="proposalDescription" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                Create Proposal
-                            </button>
-                        </form>
-                    </section>
-
-                    <section class="dao-section delegate-section">
-                        <h2>Delegate Your Voting Power</h2>
-                        <form id="delegateForm">
-                            <div class="form-group">
-                                <label for="delegateAddress">Delegate Address:</label>
-                                <input type="text" id="delegateAddress" required />
-                            </div>
-                            <button type="submit" class="btn btn-primary">Delegate</button>
-                        </form>
-                    </section>
-
-                    <!-- Enhanced Debug Panel -->
-                    <div id="debugPanel">
-                        <h3>Debug Information</h3>
-                        <pre id="debugInfo">Waiting for initialization...</pre>
-
-                        <div class="debug-section">
-                            <h4>Basic Tests</h4>
-                            <div class="debug-buttons">
-                                <button onclick="window.location.reload()">Reload Page</button>
-                                <button onclick="window.initDAOTester()">Initialize Tester</button>
-                                <button onclick="console.log(window.daoTester)">Log DAO Tester</button>
-                            </div>
-                        </div>
-
-                        <div class="debug-section">
-                            <h4>Member Management</h4>
-                            <div class="debug-buttons">
-                                <button onclick="window.daoTester?.testMemberManagement()">Check Member Status</button>
-                                <button onclick="window.daoTester?.testDAOStats()">Check DAO Stats</button>
-                            </div>
-                        </div>
-
-                        <div class="debug-section">
-                            <h4>Proposal & Voting</h4>
-                            <div class="debug-buttons">
-                                <button
-                                    onclick="window.daoTester?.testProposalCreation('Test Proposal ' + Date.now())">Create
-                                    Proposal</button>
-                                <button onclick="window.daoTester?.testVoting(prompt('Enter proposal ID:'), true)">Vote
-                                    For</button>
-                                <button onclick="window.daoTester?.testVoting(prompt('Enter proposal ID:'), false)">Vote
-                                    Against</button>
-                            </div>
-                        </div>
-
-                        <div class="debug-section">
-                            <h4>Token Operations</h4>
-                            <div class="debug-buttons">
-                                <button onclick="window.daoTester?.testTokenOperations()">Check Token Info</button>
-                                <button
-                                    onclick="window.daoTester?.testDelegation(prompt('Enter delegate address:'))">Delegate
-                                    Voting Power</button>
-                            </div>
-                        </div>
-                    </div>
-        </main>
+      </main>
     </div>
-
-    <!-- <script src="js/dao.js" type="module"></script> -->
-
-
-
-    <!-- Load Web3 first as it's needed by our modules -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script> -->
-
-    <!-- Load configuration next as it contains contract addresses and ABIs -->
-    <!-- <script src="./js/config.js"></script> -->
-
-    <!-- Load core modules bundle -->
-    <!-- <script type="module" src="./client/js/modules/core/index.js"></script> -->
-
-    <!-- Load DAO modules bundle -->
-    <!-- <script type="module" src="./client/js/modules/dao/index.js"></script> -->
-
-    <!-- <script src="./js/dao-integration.js"></script> -->
-    <!-- <script src="./js/contract-integration.js"></script> -->
-
-
-
-
-
-
-</body>
-
+  </body>
 </html>

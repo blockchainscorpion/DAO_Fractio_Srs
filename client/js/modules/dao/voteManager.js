@@ -1,3 +1,4 @@
+import { EventEmitter } from '../core/EventEmitter.js';
 /**
  * Manages vote-related functionality
  */

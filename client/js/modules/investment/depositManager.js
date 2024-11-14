@@ -1,6 +1,7 @@
 import { ContractManager } from '../core/contractManager';
 import { TransactionManager } from '../core/transactionManager';
 import { EventManager } from '../core/eventManager';
+import { EventEmitter } from '../core/EventEmitter';
 
 /**
  * Manages deposit functionality for investments
