@@ -1,9 +1,15 @@
+// Initialization check
+let isInitializing = false;
+let isInitialized = false;
 /**
  * Core Web3 initialization and setup functionality
  */
 export class Web3Setup {
   constructor() {
-    console.log('Web3Setup: Constructor initialized');
+    // Only log initializations once during construction
+    if (!isInitialized) {
+      console.log('Web3Setup: Constructor initialized');
+    }
     this.web3Instance = null;
     this.networkId = null;
     this.currentAccount = null;
@@ -15,11 +21,15 @@ export class Web3Setup {
    * @returns {boolean} Whether MetaMask is available
    */
   static checkMetaMaskAvailability() {
-    console.log('Web3Setup: Checking MetaMask availability...');
-    console.log('window.ethereum:', window.ethereum);
+    // Only log if not initialized
+    if (!isInitialized) {
+      console.log('Web3Setup: Checking MetaMask availability...');
+    }
 
     if (typeof window.ethereum !== 'undefined') {
-      console.log('Web3Setup: MetaMask is available');
+      if (!isInitialized) {
+        console.log('Web3Setup: MetaMask is available');
+      }
       return true;
     }
     console.error('Web3Setup: MetaMask not found');
@@ -33,43 +43,62 @@ export class Web3Setup {
    * @returns {Promise<Web3>} Initialized Web3 instance
    */
   async initializeWeb3() {
-    console.log('Web3Setup: Starting Web3 initialization...');
+    // a. If already initialized, return existing instance
+    if (isInitialized && this.web3Instance) {
+      return this.web3Instance;
+    }
+
+    // b. If currently initializing, wait and return
+    if (isInitializing) {
+      return this.web3Instance;
+    }
+
+    isInitializing = true;
 
     try {
+      if (!isInitialized) {
+        console.log('Web3Setup: Starting Web3 initialization...');
+      }
+
       // 1. Check permissions
-      console.log('Web3Setup: Checking MetaMask availability...');
       if (!Web3Setup.checkMetaMaskAvailability()) {
         throw new Error('No Web3 provider available');
       }
 
       // 2. Create Web3 instance
-      console.log('Web3Setup: Creating Web3 instance...');
       this.web3Instance = new Web3(window.ethereum);
-      console.log('Web3Setup: Web3 instance created:', this.web3Instance);
+      if (!isInitialized) {
+        console.log('Web3Setup: Web3 instance created:', this.web3Instance);
+      }
 
       // 3. Verify network
-      console.log('Web3Setup: Verifying network...');
       await this.verifyNetwork();
 
       // 4. Request account access
-      console.log('Web3Setup: Requesting account access...');
       const accounts = await this.requestAccounts();
       this.currentAccount = accounts[0];
-      console.log('Web3Setup: Connected account:', this.currentAccount);
+      if (!isInitialized) {
+        console.log('Web3Setup: Connected account:', this.currentAccount);
+      }
 
-      // 5. Set up event listeners
-      console.log('Web3Setup: Setting up event listeners...');
-      this.setupEventListeners();
+      // 5. Set up event listeners (only if not already initialized)
+      if (!isInitialized) {
+        this.setupEventListeners();
+      }
 
       // 6. Final verification
-      console.log('Web3Setup: Verifying connection...');
       const isListening = await this.web3Instance.eth.net.isListening();
-      console.log('Web3Setup: Network connection verified:', isListening);
+      if (!isInitialized) {
+        console.log('Web3Setup: Network connection verified:', isListening);
+      }
 
+      isInitialized = true;
       return this.web3Instance;
     } catch (error) {
       console.error('Web3Setup: Initialization failed:', error);
-      throw new Error(`Web3 initialization failed: ${error.message}`);
+      throw error;
+    } finally {
+      isInitializing = false;
     }
   }
 

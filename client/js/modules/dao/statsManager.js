@@ -3,33 +3,97 @@
  */
 export class StatsManager {
   constructor(daoManager) {
+    if (!daoManager) {
+      throw new Error('DAOManager instance required');
+    }
     this.daoManager = daoManager;
   }
 
   /**
-   * Load DAO statistics
+   * Initialize stats manager
+   * @returns {Promise<boolean>} Initialization success
+   */
+  async initialize() {
+    try {
+      // Verify contract availability
+      if (!this.daoManager.governanceContract) {
+        throw new Error('Governance contract not initialized');
+      }
+
+      // Test contract connection
+      await this.daoManager.governanceContract.methods.votingPeriod().call();
+
+      return true;
+    } catch (error) {
+      console.error('StatsManager initialization failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load DAO statistics with validation
    * @returns {Promise<Object>} DAO statistics
    */
   async loadDAOStats() {
     try {
-      const [totalMembers, activeProposals, votingPower, quorumPercentage] =
-        await Promise.all([
-          this.getTotalMembers(),
-          this.getActiveProposals(),
-          this.getVotingPower(),
-          this.getQuorumPercentage(),
-        ]);
+      // Ensure initialized
+      if (!this.daoManager.governanceContract) {
+        throw new Error('Must initialize StatsManager first');
+      }
 
-      return {
-        totalMembers,
-        activeProposals,
-        votingPower,
-        quorumPercentage,
+      const stats = {
+        totalMembers: await this.getTotalMembers().catch(() => 0),
+        activeProposals: await this.getActiveProposals().catch(() => 0),
+        votingPower: await this.getVotingPower().catch(() => '0'),
+        quorumPercentage: await this.getQuorumPercentage().catch(() => 0),
       };
+
+      this.updateUI(stats);
+      return stats;
     } catch (error) {
       console.error('Error loading DAO stats:', error);
-      throw error;
+      const defaultStats = {
+        totalMembers: 0,
+        activeProposals: 0,
+        votingPower: '0',
+        quorumPercentage: 0,
+      };
+      this.updateUI(defaultStats);
+      return defaultStats;
     }
+  }
+
+  /**
+   * Update UI with stats
+   * @private
+   */
+  updateUI(stats) {
+    Object.entries(stats).forEach(([key, value]) => {
+      const element = document.getElementById(key);
+      if (element) {
+        element.textContent = value.toString();
+      }
+    });
+  }
+
+  /**
+   * Update UI elements with stats
+   * @param {Object} stats DAO statistics
+   */
+  updateUIStats(stats) {
+    const elements = {
+      totalMembers: document.getElementById('totalMembers'),
+      activeProposals: document.getElementById('activeProposals'),
+      votingPower: document.getElementById('votingPower'),
+      quorumPercentage: document.getElementById('quorumPercentage'),
+    };
+
+    // Update each element if it exists
+    Object.entries(elements).forEach(([key, element]) => {
+      if (element) {
+        element.textContent = stats[key].toString();
+      }
+    });
   }
 
   /**

@@ -1,10 +1,16 @@
 import { EventEmitter } from './EventEmitter.js';
+let isContractInitializing = false;
+let isContractInitialized = false;
+
 /**
  * Manages contract instances and interactions
  */
 export class ContractManager {
   constructor(web3Instance) {
-    console.log('ContractManager: Initializing...');
+    // Only log once during construction
+    if (!isContractInitialized) {
+      console.log('ContractManager: Initializing...');
+    }
     this.web3 = web3Instance;
     this.contracts = new Map();
     this.currentAccount = null;
@@ -16,9 +22,22 @@ export class ContractManager {
    * @returns {Promise<boolean>} Initialization success
    */
   async initialize(account) {
+    // If already initialized, return true
+    if (isContractInitialized) {
+      return true;
+    }
+
+    // If currently initializing, wait
+    if (isContractInitializing) {
+      return false;
+    }
+
+    isContractInitializing = true;
+
     try {
-      console.log('ContractManager: Starting initialization...');
-      this.currentAccount = account;
+      if (!isContractInitialized) {
+        console.log('ContractManager: Starting initialization...');
+      }
 
       // 1. Check permissions and requirements
       if (!this.web3) {
@@ -28,17 +47,19 @@ export class ContractManager {
         throw new Error('No account provided');
       }
 
-      // 2. Verify contract state by initializing primary contracts
+      // 2. Initialize contracts
       await this.initializeContracts();
 
-      // 3. Execute contract verification
+      // 3. Verify contracts
       await this.verifyContracts();
 
-      console.log('ContractManager: Initialization complete');
+      isContractInitialized = true;
       return true;
     } catch (error) {
       console.error('ContractManager: Initialization failed:', error);
-      throw new Error(`Contract initialization failed: ${error.message}`);
+      throw error;
+    } finally {
+      isContractInitializing = false;
     }
   }
 
@@ -46,9 +67,11 @@ export class ContractManager {
    * Initialize primary contracts
    */
   async initializeContracts() {
-    console.log('ContractManager: Initializing contracts...');
-
     try {
+      if (!isContractInitialized) {
+        console.log('ContractManager: Initializing contracts...');
+      }
+
       // Initialize Governance contract
       this.contracts.set(
         'Governance',
@@ -57,7 +80,9 @@ export class ContractManager {
           window.CONFIG.GOVERNANCE_ADDRESS
         )
       );
-      console.log('ContractManager: Governance contract initialized');
+      if (!isContractInitialized) {
+        console.log('ContractManager: Governance contract initialized');
+      }
 
       // Initialize GovernanceToken contract
       this.contracts.set(
@@ -67,7 +92,9 @@ export class ContractManager {
           window.CONFIG.TOKEN_ADDRESS
         )
       );
-      console.log('ContractManager: GovernanceToken contract initialized');
+      if (!isContractInitialized) {
+        console.log('ContractManager: GovernanceToken contract initialized');
+      }
     } catch (error) {
       console.error('ContractManager: Failed to initialize contracts:', error);
       throw error;
@@ -78,21 +105,27 @@ export class ContractManager {
    * Verify contract connections by calling view methods
    */
   async verifyContracts() {
-    console.log('ContractManager: Verifying contracts...');
-
     try {
+      if (!isContractInitialized) {
+        console.log('ContractManager: Verifying contracts...');
+      }
+
       // Verify Governance contract
       const governance = this.getContract('Governance');
       await governance.methods.votingPeriod().call();
-      console.log('ContractManager: Governance contract verified');
+      if (!isContractInitialized) {
+        console.log('ContractManager: Governance contract verified');
+      }
 
       // Verify GovernanceToken contract
       const token = this.getContract('GovernanceToken');
       await token.methods.name().call();
-      console.log('ContractManager: GovernanceToken contract verified');
+      if (!isContractInitialized) {
+        console.log('ContractManager: GovernanceToken contract verified');
+      }
     } catch (error) {
       console.error('ContractManager: Contract verification failed:', error);
-      throw new Error(`Contract verification failed: ${error.message}`);
+      throw error;
     }
   }
 
