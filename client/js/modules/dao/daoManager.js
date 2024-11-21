@@ -3,7 +3,7 @@ import { EventEmitter } from '../core/EventEmitter.js';
  * Core DAO management functionality
  */
 export class DAOManager {
-  constructor(web3Instance, contractManager, transactionManager, eventManager) {
+  constructor(web3Instance, contractManager,eventManager, transactionManager) {
     this.web3 = web3Instance;
     this.contractManager = contractManager;
     this.transactionManager = transactionManager;
@@ -18,12 +18,20 @@ export class DAOManager {
    */
   async initialize() {
     try {
-      // Initialize contract instances
-      this.governanceContract = this.contractManager.getContract('Governance');
-      this.tokenContract = this.contractManager.getContract('GovernanceToken');
+      // Initialize contracts directly instead of using ContractManager
+      this.governanceContract = new this.web3.eth.Contract(
+        CONFIG.GOVERNANCE_ABI,
+        CONFIG.GOVERNANCE_ADDRESS
+      );
 
-      // Verify contract connections
-      await this.contractManager.verifyContracts();
+      this.tokenContract = new this.web3.eth.Contract(
+        CONFIG.GOVERNANCE_TOKEN_ABI,
+        CONFIG.TOKEN_ADDRESS
+      );
+
+      // Verify contracts
+      await this.governanceContract.methods.votingPeriod().call();
+      await this.tokenContract.methods.name().call();
 
       // Get current account
       const accounts = await this.web3.eth.getAccounts();

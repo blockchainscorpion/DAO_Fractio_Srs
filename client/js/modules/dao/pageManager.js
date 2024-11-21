@@ -144,6 +144,6 @@ export class PageManager {
         await this.proposalManager.createProposal(description);
       });
 
-    // Add other form handlers as needed
+    // other form handlers as needed
   }
 }

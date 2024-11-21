@@ -2,7 +2,7 @@
  * Enhanced UserManagement Module
  * Handles all user and admin related functionality for the DAO
  */
-class UserManagement {
+export class UserManagement {
   constructor(daoManager, contractManager) {
     this.daoManager = daoManager;
     this.contractManager = contractManager;
@@ -19,6 +19,10 @@ class UserManagement {
       // 1. Check permissions
       if (!this.contractManager || !this.daoManager) {
         throw new Error('Required managers not provided');
+      }
+
+      if (!this.daoManager.governanceContract) {
+        await this.daoManager.initialize();
       }
 
       // 2. Verify contract state
