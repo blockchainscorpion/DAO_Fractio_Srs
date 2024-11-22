@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  dao-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: dao-test
+    ports:
+      - "3000:3000"  # Frontend
+      - "7545:7545"  # Ganache
+      - "8545:8545"  # Additional blockchain port
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - GANACHE_HOST=0.0.0.0
+    networks:
+      - dao-network
+
+  # Optional test container for running tests in isolation
+  dao-test:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: dao-test-runner
+    command: truffle test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - dao-app
+    networks:
+      - dao-network
+
+networks:
+  dao-network:
+    driver: bridge

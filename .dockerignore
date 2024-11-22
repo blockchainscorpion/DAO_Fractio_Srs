@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build files
+build
+dist
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Version control
+.git
+.gitignore
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Truffle files
+.truffle-solidity-loader
+truffle_logs/
+
+# Testing
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Misc
+.DS_Store
+*.log
+README.md
+CHANGELOG.md
