@@ -93,92 +93,156 @@ async function loadMembers() {
 
     membersTableBody.innerHTML = ''; // Clear existing entries
     let memberCount = 0;
+    const processedMembers = new Set(); // Track processed members to avoid duplicates
 
+    // First get the member list
     while (true) {
       try {
+        // Get member address from the list
         const memberAddress =
           await userManager.daoManager.governanceContract.methods
             .memberList(memberCount)
             .call();
 
+        // Skip if we've already processed this member
+        if (processedMembers.has(memberAddress.toLowerCase())) {
+          continue;
+        }
+
+        // Get full member details
         const memberInfo = await userManager.getMemberDetails(memberAddress);
-        const delegateInfo =
-          await userManager.daoManager.governanceContract.methods
-            .delegates(memberAddress)
-            .call();
+        console.log(`Member ${memberCount} details:`, memberInfo);
 
-        const row = createMemberRow({
-          address: memberAddress,
-          ...memberInfo,
-          delegatedTo: delegateInfo,
-        });
+        // Only proceed if the member is approved
+        if (memberInfo.isApproved) {
+          processedMembers.add(memberAddress.toLowerCase());
 
-        membersTableBody.appendChild(row);
+          // Get delegation info
+          const delegateInfo =
+            await userManager.daoManager.governanceContract.methods
+              .delegates(memberAddress)
+              .call();
+
+          // Create and append the row
+          const row = createMemberRow({
+            address: memberAddress,
+            ...memberInfo,
+            delegatedTo: delegateInfo,
+          });
+
+          membersTableBody.appendChild(row);
+        }
+
         memberCount++;
       } catch (e) {
+        // If we get an error, we've likely reached the end of the member list
         break;
       }
     }
 
-    updateDebugInfo(`Loaded ${memberCount} members successfully`);
+    updateDebugInfo(`Loaded ${processedMembers.size} members successfully`);
   } catch (error) {
+    console.error('Error loading members:', error);
     updateDebugInfo(`Error loading members: ${error.message}`);
   }
 }
 
 // Function to create member row
 function createMemberRow(member) {
+  // Convert Wei to ETH for display
+  const votingPowerEth = userManager.daoManager.web3.utils.fromWei(
+    member.votingPower,
+    'ether'
+  );
+  // const web3 = userManager.daoManager.web3;
+
   const row = document.createElement('tr');
-  const web3 = userManager.daoManager.web3;
   row.innerHTML = `
-        <td>${member.address}</td>
-        <td>${web3.utils.fromWei(member.votingPower, 'ether')} ETH</td>
-        <td>${member.hasPassedKYC ? 'Approved' : 'Pending'}</td>
-        <td>${member.isApproved ? 'Yes' : 'No'}</td>
-        <td>${
-          member.delegatedTo === '0x0000000000000000000000000000000000000000'
-            ? 'None'
-            : member.delegatedTo
-        }</td>
-        <td>${
-          member.isAdmin ? '<span class="badge bg-primary">Admin</span>' : 'No'
-        }</td>
-        <td>
-            <button class="btn btn-sm btn-primary me-2" onclick="manageMember('${
-              member.address
-            }')">
-                Manage
-            </button>
-            <button class="btn btn-sm btn-info" onclick="viewMemberDetails('${
-              member.address
-            }')">
-                Details
-            </button>
-        </td>
-    `;
+    <td>${member.address}</td>
+    <td>${votingPowerEth} ETH</td>
+    <td>${member.hasPassedKYC ? 'Approved' : 'Pending'}</td>
+    <td>${member.isApproved ? 'Yes' : 'No'}</td>
+    <td>${
+      member.delegatedTo === '0x0000000000000000000000000000000000000000'
+        ? 'None'
+        : member.delegatedTo
+    }</td>
+    <td>${
+      member.isAdmin ? '<span class="badge bg-primary">Admin</span>' : 'No'
+    }</td>
+    <td>
+      <button onclick="manageMember('${
+        member.address
+      }')" class="btn btn-sm btn-primary me-2">
+        Manage
+      </button>
+      <button onclick="viewMemberDetails('${
+        member.address
+      }')" class="btn btn-sm btn-info">
+        Details
+      </button>
+    </td>
+  `;
+
   return row;
 }
 
 async function handleAddMember(event) {
   event.preventDefault();
   try {
+    // Get form values
     const address = document.getElementById('memberAddress').value;
     const votingPower = document.getElementById('votingPower').value;
 
     updateDebugInfo(`Adding member ${address}...`);
-    await userManager.addMember(
-      address,
-      web3.utils.toWei(votingPower, 'ether'),
-      {
-        from: await userManager.daoManager.getCurrentAccount(),
-      }
-    );
 
+    // 1. Check if userManager is initialized
+    if (!userManager) {
+      throw new Error('User manager not initialized');
+    }
+
+    // 2. Verify input values
+    if (!address || !votingPower) {
+      throw new Error('Address and voting power are required');
+    }
+
+    // Get web3 instance from daoManager
+    const web3 = userManager.daoManager.web3;
+    if (!web3) {
+      throw new Error('Web3 not initialized');
+    }
+
+    // Convert voting power to Wei
+    const votingPowerWei = web3.utils.toWei(votingPower, 'ether');
+
+    // 3. Execute transaction
+    await userManager.addMember(address, votingPowerWei, {
+      from: await userManager.daoManager.getCurrentAccount(),
+    });
+
+    // 4. Handle success
     $('#addMemberModal').modal('hide');
     await loadMembers();
     updateDebugInfo(`Member ${address} added successfully`);
   } catch (error) {
-    updateDebugInfo(`Failed to add member: ${error.message}`);
+    // 5. Handle specific error cases with clear messages
+    let errorMessage = 'Failed to add member: ';
+
+    if (error.message.includes('User manager not initialized')) {
+      errorMessage +=
+        'System not properly initialized. Please refresh and try again.';
+    } else if (error.message.includes('Web3 not initialized')) {
+      errorMessage +=
+        'Web3 connection failed. Please check your wallet connection.';
+    } else if (error.message.includes('revert')) {
+      errorMessage +=
+        'Transaction reverted by the blockchain. Check if you have admin rights.';
+    } else {
+      errorMessage += error.message;
+    }
+
+    updateDebugInfo(errorMessage);
+    console.error('Failed to add member:', error);
   }
 }
 
@@ -249,10 +313,12 @@ window.manageMember = async (address) => {
   try {
     const memberInfo = await userManager.getMemberDetails(address);
     document.getElementById('manageMemberAddress').value = address;
-    document.getElementById('updateVotingPower').value = web3.utils.fromWei(
-      memberInfo.votingPower,
-      'ether'
-    );
+    // Use daoManager's web3 instance
+    document.getElementById('updateVotingPower').value =
+      userManager.daoManager.web3.utils.fromWei(
+        memberInfo.votingPower,
+        'ether'
+      );
     document.getElementById('kycStatus').checked = memberInfo.hasPassedKYC;
     $('#manageMemberModal').modal('show');
   } catch (error) {

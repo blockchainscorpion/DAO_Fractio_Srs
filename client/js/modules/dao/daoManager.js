@@ -3,7 +3,7 @@ import { EventEmitter } from '../core/EventEmitter.js';
  * Core DAO management functionality
  */
 export class DAOManager {
-  constructor(web3Instance, contractManager,eventManager, transactionManager) {
+  constructor(web3Instance, contractManager, eventManager, transactionManager) {
     this.web3 = web3Instance;
     this.contractManager = contractManager;
     this.transactionManager = transactionManager;
