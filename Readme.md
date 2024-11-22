@@ -80,9 +80,9 @@ I'm a solo developer learning and building in public. If you're passionate about
 Let's connect! I'm especially keen to collaborate with security-focused developers.
 Contact me:
 
-GitHub: [YourGitHubProfile]
-Email: [Your Email]
-Twitter: [Your Twitter]
+GitHub: [[YourGitHubProfile](https://github.com/blockchainscorpion)]
+Email: [fractio.team@gmail.com](mailto:fractio.team@gmail.com)
+Twitter: [@FractioTeam]
 
 ## Repository Structure
 
