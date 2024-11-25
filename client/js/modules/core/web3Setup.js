@@ -1,19 +1,18 @@
-// Initialization check
+import { ErrorService, ErrorCodes } from './errorService.js';
+
 let isInitializing = false;
-let isInitialized = false;
+
 /**
  * Core Web3 initialization and setup functionality
  */
 export class Web3Setup {
   constructor() {
-    // Only log initializations once during construction
-    if (!isInitialized) {
-      console.log('Web3Setup: Constructor initialized');
-    }
+    console.log('Web3Setup: Constructor initialized');
     this.web3Instance = null;
     this.networkId = null;
     this.currentAccount = null;
     this.requiredChainId = '0x539'; // Ganache chainId (1337 in hex)
+    this.errorService = new ErrorService({ debug: true });
   }
 
   /**
@@ -21,21 +20,18 @@ export class Web3Setup {
    * @returns {boolean} Whether MetaMask is available
    */
   static checkMetaMaskAvailability() {
-    // Only log if not initialized
-    if (!isInitialized) {
-      console.log('Web3Setup: Checking MetaMask availability...');
+    console.log('Web3Setup: Checking MetaMask availability...');
+
+    if (typeof window.ethereum === 'undefined') {
+      throw this.errorService.createError(
+        'MetaMask not installed. Please install MetaMask to use this application.',
+        ErrorCodes.METAMASK_NOT_FOUND,
+        { browserInfo: navigator.userAgent }
+      );
     }
 
-    if (typeof window.ethereum !== 'undefined') {
-      if (!isInitialized) {
-        console.log('Web3Setup: MetaMask is available');
-      }
-      return true;
-    }
-    console.error('Web3Setup: MetaMask not found');
-    throw new Error(
-      'MetaMask not installed. Please install MetaMask to use this application.'
-    );
+    console.log('Web3Setup: MetaMask is available');
+    return true;
   }
 
   /**
@@ -43,12 +39,8 @@ export class Web3Setup {
    * @returns {Promise<Web3>} Initialized Web3 instance
    */
   async initializeWeb3() {
-    // a. If already initialized, return existing instance
-    if (isInitialized && this.web3Instance) {
-      return this.web3Instance;
-    }
+    console.log('Web3Setup: Starting Web3 initialization...');
 
-    // b. If currently initializing, wait and return
     if (isInitializing) {
       return this.web3Instance;
     }
@@ -56,47 +48,55 @@ export class Web3Setup {
     isInitializing = true;
 
     try {
-      if (!isInitialized) {
-        console.log('Web3Setup: Starting Web3 initialization...');
-      }
-
       // 1. Check permissions
       if (!Web3Setup.checkMetaMaskAvailability()) {
-        throw new Error('No Web3 provider available');
+        throw this.errorService.createError(
+          'No Web3 provider available',
+          ErrorCodes.WEB3_NOT_INITIALIZED
+        );
       }
 
       // 2. Create Web3 instance
+      console.log('Web3Setup: Creating Web3 instance...');
       this.web3Instance = new Web3(window.ethereum);
-      if (!isInitialized) {
-        console.log('Web3Setup: Web3 instance created:', this.web3Instance);
-      }
 
       // 3. Verify network
+      console.log('Web3Setup: Verifying network...');
       await this.verifyNetwork();
 
       // 4. Request account access
+      console.log('Web3Setup: Requesting account access...');
       const accounts = await this.requestAccounts();
       this.currentAccount = accounts[0];
-      if (!isInitialized) {
-        console.log('Web3Setup: Connected account:', this.currentAccount);
-      }
+      console.log('Web3Setup: Connected account:', this.currentAccount);
 
-      // 5. Set up event listeners (only if not already initialized)
-      if (!isInitialized) {
-        this.setupEventListeners();
-      }
+      // 5. Set up event listeners
+      console.log('Web3Setup: Setting up event listeners...');
+      this.setupEventListeners();
 
       // 6. Final verification
+      console.log('Web3Setup: Verifying connection...');
       const isListening = await this.web3Instance.eth.net.isListening();
-      if (!isInitialized) {
-        console.log('Web3Setup: Network connection verified:', isListening);
+
+      if (!isListening) {
+        throw this.errorService.createError(
+          'Failed to establish network connection',
+          ErrorCodes.NETWORK_ERROR,
+          { provider: window.ethereum?.isMetaMask ? 'MetaMask' : 'Unknown' }
+        );
       }
 
-      isInitialized = true;
+      console.log('Web3Setup: Network connection verified:', isListening);
       return this.web3Instance;
     } catch (error) {
-      console.error('Web3Setup: Initialization failed:', error);
-      throw error;
+      const processedError = this.errorService.handleError(error, {
+        operation: 'initializeWeb3',
+        provider: window.ethereum?.isMetaMask ? 'MetaMask' : 'Unknown',
+        originalMessage: error.message,
+      });
+
+      console.error('Web3Setup: Initialization failed:', processedError);
+      throw processedError;
     } finally {
       isInitializing = false;
     }
@@ -129,6 +129,10 @@ export class Web3Setup {
 
     window.ethereum.on('disconnect', (error) => {
       console.log('Web3Setup: Disconnected from network:', error);
+      this.errorService.handleError(error, {
+        operation: 'networkDisconnect',
+        context: 'eventListener',
+      });
     });
   }
 
@@ -145,8 +149,11 @@ export class Web3Setup {
       console.log('Web3Setup: Accounts received:', accounts);
       return accounts;
     } catch (error) {
-      console.error('Web3Setup: Error requesting account access:', error);
-      throw new Error(`Failed to get account access: ${error.message}`);
+      throw this.errorService.handleError(error, {
+        operation: 'requestAccounts',
+        context: 'MetaMask interaction',
+        originalMessage: error.message,
+      });
     }
   }
 
@@ -168,8 +175,12 @@ export class Web3Setup {
         await this.switchNetwork();
       }
     } catch (error) {
-      console.error('Web3Setup: Network verification failed:', error);
-      throw error;
+      throw this.errorService.handleError(error, {
+        operation: 'verifyNetwork',
+        currentChainId: chainId,
+        requiredChainId: this.requiredChainId,
+        originalMessage: error.message,
+      });
     }
   }
 
@@ -189,7 +200,11 @@ export class Web3Setup {
         console.log('Web3Setup: Network not found, adding Ganache...');
         await this.addGanacheNetwork();
       } else {
-        throw error;
+        throw this.errorService.handleError(error, {
+          operation: 'switchNetwork',
+          targetChainId: this.requiredChainId,
+          originalMessage: error.message,
+        });
       }
     }
   }
@@ -217,8 +232,10 @@ export class Web3Setup {
       });
       console.log('Web3Setup: Ganache network added successfully');
     } catch (error) {
-      console.error('Web3Setup: Failed to add Ganache network:', error);
-      throw new Error(`Failed to add Ganache network: ${error.message}`);
+      throw this.errorService.handleError(error, {
+        operation: 'addGanacheNetwork',
+        originalMessage: error.message,
+      });
     }
   }
 

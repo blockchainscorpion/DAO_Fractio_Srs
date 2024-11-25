@@ -1,4 +1,8 @@
+// client/js/modules/core/contractManager.js
+
+import { ErrorService, ErrorCodes } from './errorService.js';
 import { EventEmitter } from './EventEmitter.js';
+
 let isContractInitializing = false;
 let isContractInitialized = false;
 
@@ -6,14 +10,19 @@ let isContractInitialized = false;
  * Manages contract instances and interactions
  */
 export class ContractManager {
+  /**
+   * Initialize contract manager
+   * @param {Web3} web3Instance Web3 instance
+   */
   constructor(web3Instance) {
-    // Only log once during construction
     if (!isContractInitialized) {
       console.log('ContractManager: Initializing...');
     }
+
     this.web3 = web3Instance;
     this.contracts = new Map();
     this.currentAccount = null;
+    this.errorService = new ErrorService({ debug: true });
   }
 
   /**
@@ -35,16 +44,20 @@ export class ContractManager {
     isContractInitializing = true;
 
     try {
-      if (!isContractInitialized) {
-        console.log('ContractManager: Starting initialization...');
-      }
-
       // 1. Check permissions and requirements
       if (!this.web3) {
-        throw new Error('Web3 instance not provided');
+        throw this.errorService.createError(
+          'Web3 instance not provided',
+          ErrorCodes.WEB3_NOT_INITIALIZED
+        );
       }
+
       if (!account) {
-        throw new Error('No account provided');
+        throw this.errorService.createError(
+          'No account provided',
+          ErrorCodes.INVALID_PARAMETERS,
+          { requiredParam: 'account' }
+        );
       }
 
       // 2. Initialize contracts
@@ -56,8 +69,11 @@ export class ContractManager {
       isContractInitialized = true;
       return true;
     } catch (error) {
-      console.error('ContractManager: Initialization failed:', error);
-      throw error;
+      throw this.errorService.handleError(error, {
+        operation: 'initialize',
+        account,
+        originalMessage: error.message,
+      });
     } finally {
       isContractInitializing = false;
     }
@@ -80,9 +96,6 @@ export class ContractManager {
           window.CONFIG.GOVERNANCE_ADDRESS
         )
       );
-      if (!isContractInitialized) {
-        console.log('ContractManager: Governance contract initialized');
-      }
 
       // Initialize GovernanceToken contract
       this.contracts.set(
@@ -92,12 +105,19 @@ export class ContractManager {
           window.CONFIG.TOKEN_ADDRESS
         )
       );
+
       if (!isContractInitialized) {
-        console.log('ContractManager: GovernanceToken contract initialized');
+        console.log('ContractManager: Contracts initialized');
       }
     } catch (error) {
-      console.error('ContractManager: Failed to initialize contracts:', error);
-      throw error;
+      throw this.errorService.handleError(error, {
+        operation: 'initializeContracts',
+        originalMessage: error.message,
+        context: {
+          governanceAddress: window.CONFIG.GOVERNANCE_ADDRESS,
+          tokenAddress: window.CONFIG.TOKEN_ADDRESS,
+        },
+      });
     }
   }
 
@@ -113,19 +133,18 @@ export class ContractManager {
       // Verify Governance contract
       const governance = this.getContract('Governance');
       await governance.methods.votingPeriod().call();
-      if (!isContractInitialized) {
-        console.log('ContractManager: Governance contract verified');
-      }
 
       // Verify GovernanceToken contract
       const token = this.getContract('GovernanceToken');
       await token.methods.name().call();
-      if (!isContractInitialized) {
-        console.log('ContractManager: GovernanceToken contract verified');
-      }
     } catch (error) {
-      console.error('ContractManager: Contract verification failed:', error);
-      throw error;
+      throw this.errorService.handleError(error, {
+        operation: 'verifyContracts',
+        originalMessage: error.message,
+        context: {
+          contracts: Array.from(this.contracts.keys()),
+        },
+      });
     }
   }
 
@@ -137,7 +156,11 @@ export class ContractManager {
   getContract(name) {
     const contract = this.contracts.get(name);
     if (!contract) {
-      throw new Error(`Contract ${name} not initialized`);
+      throw this.errorService.createError(
+        `Contract ${name} not initialized`,
+        ErrorCodes.CONTRACT_NOT_INITIALIZED,
+        { contractName: name }
+      );
     }
     return contract;
   }
@@ -153,7 +176,10 @@ export class ContractManager {
     try {
       // 1. Check permissions
       if (!this.currentAccount) {
-        throw new Error('No account connected');
+        throw this.errorService.createError(
+          'No account connected',
+          ErrorCodes.USER_NOT_AUTHORIZED
+        );
       }
 
       // 2. Verify contract state
@@ -164,17 +190,19 @@ export class ContractManager {
         `ContractManager: Calling ${contractName}.${method} with args:`,
         args
       );
+
       const result = await contract.methods[method](...args).call();
       console.log(`ContractManager: ${contractName}.${method} result:`, result);
 
       return result;
     } catch (error) {
-      // 4. Handle errors with specific messages
-      console.error(
-        `ContractManager: Call to ${contractName}.${method} failed:`,
-        error
-      );
-      throw new Error(`Contract call failed: ${error.message}`);
+      throw this.errorService.handleError(error, {
+        operation: 'call',
+        contract: contractName,
+        method,
+        args,
+        originalMessage: error.message,
+      });
     }
   }
 
@@ -190,7 +218,11 @@ export class ContractManager {
     try {
       // 1. Check permissions
       if (!this.currentAccount) {
-        throw new Error('No account connected');
+        throw this.errorService.createError(
+          'No account connected',
+          ErrorCodes.USER_NOT_AUTHORIZED,
+          { requiredAccount: true }
+        );
       }
 
       // 2. Verify contract state
@@ -202,14 +234,14 @@ export class ContractManager {
         args
       );
 
-      // Estimate gas for the transaction
-      const gas = await contract.methods[method](...args).estimateGas({
+      // Estimate gas
+      const gasEstimate = await contract.methods[method](...args).estimateGas({
         from: this.currentAccount,
         ...options,
       });
 
       // Add 20% buffer to gas estimate
-      const gasLimit = Math.floor(gas * 1.2);
+      const gasLimit = Math.floor(gasEstimate * 1.2);
 
       // Send transaction
       const receipt = await contract.methods[method](...args).send({
@@ -222,21 +254,59 @@ export class ContractManager {
         `ContractManager: ${contractName}.${method} transaction receipt:`,
         receipt
       );
+
       return receipt;
     } catch (error) {
       // 4. Handle errors with specific messages
-      let errorMessage = `Transaction to ${contractName}.${method} failed: `;
+      let errorToThrow;
 
       if (error.code === 4001) {
-        errorMessage += 'Transaction rejected by user';
+        errorToThrow = this.errorService.createError(
+          'Transaction rejected by user',
+          ErrorCodes.USER_NOT_AUTHORIZED,
+          { userRejected: true }
+        );
       } else if (error.message.includes('execution reverted')) {
-        errorMessage += 'Transaction reverted: ' + error.message;
+        errorToThrow = this.errorService.createError(
+          'Transaction reverted: ' + error.message,
+          ErrorCodes.TRANSACTION_FAILED,
+          { revertReason: error.message }
+        );
       } else {
-        errorMessage += error.message;
+        errorToThrow = this.errorService.handleError(error, {
+          operation: 'send',
+          contract: contractName,
+          method,
+          args,
+          originalMessage: error.message,
+        });
       }
 
-      console.error('ContractManager:', errorMessage, error);
-      throw new Error(errorMessage);
+      console.error('ContractManager: Transaction failed:', errorToThrow);
+      throw errorToThrow;
     }
+  }
+
+  /**
+   * Set current account
+   * @param {string} account Account address
+   */
+  setCurrentAccount(account) {
+    if (!this.web3.utils.isAddress(account)) {
+      throw this.errorService.createError(
+        'Invalid account address',
+        ErrorCodes.INVALID_ADDRESS,
+        { address: account }
+      );
+    }
+    this.currentAccount = account;
+  }
+
+  /**
+   * Get current account
+   * @returns {string|null} Current account address
+   */
+  getCurrentAccount() {
+    return this.currentAccount;
   }
 }

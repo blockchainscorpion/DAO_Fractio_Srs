@@ -1,15 +1,14 @@
-version: '3.8'
-
 services:
   dao-app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
-    container_name: dao-test
+    image: rbcscorpion/dao-fractio:latest # Added image name
+    container_name: dao-fractio
     ports:
-      - "3000:3000"  # Frontend
-      - "7545:7545"  # Ganache
-      - "8545:8545"  # Additional blockchain port
+      - '3000:3000' # Frontend
+      - '7545:7545' # Ganache
+      - '8545:8545' # Additional blockchain port
     volumes:
       - .:/app
       - /app/node_modules
@@ -19,12 +18,12 @@ services:
     networks:
       - dao-network
 
-  # Optional test container for running tests in isolation
   dao-test:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
-    container_name: dao-test-runner
+    image: rbcscorpion/dao-fractio:test # Added test image name
+    container_name: dao-fractio-runner
     command: truffle test
     volumes:
       - .:/app
